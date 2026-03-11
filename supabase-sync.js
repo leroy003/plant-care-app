@@ -12,7 +12,7 @@
  *   1. 用户输入用户名 → syncManager.setUsername(name)
  *   2. 操作植物后调用 → syncManager.pushToCloud()
  *   3. 需要拉取时调用 → syncManager.pullFromCloud()
- *   4. 自动定时同步   → 内置 30 秒轮询
+ *   4. 仅用户主动点击「同步」按钮时才同步
  */
 
 // ============================================================
@@ -30,7 +30,6 @@ var syncManager = (function () {
   var _username = localStorage.getItem('sync_username') || '';
   var _syncing = false;
   var _lastSyncTime = null;
-  var _syncTimer = null;
   var _initialized = false;
   var _statusCallback = null;   // UI 状态回调
   var _dataChangeCallback = null; // 数据变更回调（拉取后刷新界面）
@@ -247,24 +246,6 @@ var syncManager = (function () {
       });
   }
 
-  // ----- 自动同步 -----
-  function startAutoSync(intervalMs) {
-    stopAutoSync();
-    var interval = intervalMs || 30000; // 默认 30 秒
-    _syncTimer = setInterval(function () {
-      if (_username && SUPABASE_URL && SUPABASE_ANON_KEY) {
-        pushToCloud().catch(function () { /* 静默失败 */ });
-      }
-    }, interval);
-  }
-
-  function stopAutoSync() {
-    if (_syncTimer) {
-      clearInterval(_syncTimer);
-      _syncTimer = null;
-    }
-  }
-
   // ----- 用户名管理 -----
   function setUsername(name) {
     if (!name || !name.trim()) return false;
@@ -280,7 +261,6 @@ var syncManager = (function () {
   function clearUsername() {
     _username = '';
     localStorage.removeItem('sync_username');
-    stopAutoSync();
   }
 
   // ----- 配置与生命周期 -----
@@ -298,10 +278,6 @@ var syncManager = (function () {
   function init() {
     if (_initialized) return;
     _initialized = true;
-    // 如已有用户名且已配置，启动自动同步
-    if (_username && isConfigured()) {
-      startAutoSync();
-    }
   }
 
   // ----- 公开 API -----
@@ -314,8 +290,6 @@ var syncManager = (function () {
     pushToCloud: pushToCloud,
     pullFromCloud: pullFromCloud,
     smartSync: smartSync,
-    startAutoSync: startAutoSync,
-    stopAutoSync: stopAutoSync,
     isConfigured: isConfigured,
     getLastSyncTime: function () { return _lastSyncTime; },
     isSyncing: function () { return _syncing; }

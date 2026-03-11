@@ -1146,8 +1146,7 @@
         syncManager.setUsername(SYNC_USERNAME);
         document.getElementById('dailyAuthOverlay').classList.remove('active');
         
-        // 验证通过后自动执行一次智能同步
-        syncManager.smartSync().catch(function() {});
+        // 验证通过，等待用户主动点击同步按钮
       }
 
       // 验证按钮
