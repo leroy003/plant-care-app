@@ -1158,7 +1158,7 @@
         if (e.key === 'Enter') verifyUsername();
       });
 
-      // 同步按钮：直接执行智能同步
+      // 同步按钮：将本地当前状态上传到云端（覆盖）
       document.getElementById('btnSync').addEventListener('click', function() {
         if (!syncManager.isConfigured()) {
           showToast('同步未配置', 'error');
@@ -1172,7 +1172,7 @@
         if (!syncManager.getUsername()) {
           syncManager.setUsername(SYNC_USERNAME);
         }
-        syncManager.smartSync().catch(function() {});
+        syncManager.pushToCloud().catch(function() {});
       });
 
       // 初始化
