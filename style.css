@@ -590,7 +590,7 @@ body {
   color: #ffffff;
 }
 
-/* ========== Sync Panel ========== */
+/* ========== Sync Button ========== */
 .btn-sync {
   font-size: 13px;
   color: #666666;
@@ -608,169 +608,117 @@ body {
   border-color: #999999;
 }
 
-.sync-panel {
-  width: 360px;
-  max-width: 90vw;
+/* ========== Daily Auth Dialog ========== */
+.daily-auth-dialog {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 28px 24px;
+  width: 300px;
+  max-width: 85vw;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
 }
 
-.sync-section {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--color-border);
+.daily-auth-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 6px;
 }
 
-.sync-section:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.sync-label {
+.daily-auth-desc {
   font-size: 13px;
   color: var(--color-gray);
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
-.sync-username-row {
-  display: flex;
-  gap: 8px;
-}
-
-.sync-input {
-  flex: 1;
-  padding: 6px 12px;
-  font-size: 14px;
+.daily-auth-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 15px;
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 10px;
   outline: none;
   font-family: var(--font-family);
   color: var(--color-dark);
   background: #fafafa;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.sync-input:focus {
+.daily-auth-input:focus {
   border-color: #999999;
   background: #ffffff;
 }
 
-.sync-input::placeholder {
+.daily-auth-input::placeholder {
   color: #cccccc;
 }
 
-.sync-btn {
-  padding: 6px 14px;
-  font-size: 13px;
-  color: #666666;
+.daily-auth-hint {
+  font-size: 12px;
+  min-height: 18px;
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: var(--color-gray);
+}
+
+.daily-auth-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  color: #333333;
   background: none;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid #999999;
+  border-radius: 10px;
   cursor: pointer;
   font-family: var(--font-family);
-  white-space: nowrap;
-}
-
-.sync-btn:hover {
-  color: #333333;
-  border-color: #999999;
-}
-
-.sync-btn-set {
-  flex-shrink: 0;
-}
-
-.sync-btn-primary {
-  color: #333333;
-  border-color: #999999;
   font-weight: 600;
 }
 
-.sync-btn-primary:hover {
+.daily-auth-btn:hover {
   color: #000000;
   border-color: #333333;
 }
 
-.sync-btn-text {
-  font-size: 12px;
-  color: var(--color-gray);
-  background: none;
-  border: none;
-  cursor: pointer;
+/* ========== Sync Toast ========== */
+.sync-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-80px);
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 13px;
+  color: var(--color-dark);
   font-family: var(--font-family);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-  padding: 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  z-index: 10000;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-.sync-btn-text:hover {
-  color: #cc0000;
+.sync-toast-show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
-.sync-hint {
-  font-size: 12px;
-  color: var(--color-gray);
-  margin-top: 6px;
-  line-height: 1.5;
+.sync-toast-syncing {
+  border-color: #e6a800;
 }
 
-.sync-user-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.sync-toast-success {
+  border-color: #00BC3E;
 }
 
-.sync-username-display {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-dark);
+.sync-toast-error {
+  border-color: #cc0000;
 }
 
-.sync-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.sync-actions .sync-btn {
-  flex: 1;
-  text-align: center;
-  min-width: 80px;
-}
-
-.sync-status {
-  font-size: 13px;
-  padding: 6px 0;
-  line-height: 1.5;
-}
-
-.sync-status-syncing {
-  color: #e69500;
-}
-
-.sync-status-success {
-  color: #00BC3E;
-}
-
-.sync-status-error {
-  color: #cc0000;
-}
-
-.sync-status-info {
-  color: var(--color-gray);
-}
-
-.sync-last-time {
-  font-size: 12px;
-  color: var(--color-gray);
-}
-
-.sync-auto-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--color-dark);
-  cursor: pointer;
-}
-
-.sync-auto-label input[type="checkbox"] {
-  cursor: pointer;
-  margin: 0;
+.sync-toast-info {
+  border-color: var(--color-border);
 }

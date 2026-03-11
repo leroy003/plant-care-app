@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=38">
+  <link rel="stylesheet" href="style.css?v=39">
 </head>
 <body>
 
@@ -196,62 +196,19 @@
     </div>
   </div>
 
-  <!-- 同步面板遮罩层 -->
-  <div class="overlay" id="syncOverlay">
-    <div class="card sync-panel" id="syncPanel">
-      <div class="card-header">
-        <div class="card-title">跨设备同步</div>
-        <button class="card-close" id="syncClose">关闭</button>
-      </div>
-
-      <!-- 未配置提示 -->
-      <div class="sync-section" id="syncNotConfigured" style="display:none;">
-        <div class="sync-hint">⚠️ Supabase 未配置，同步功能不可用。请在 supabase-sync.js 中填写 SUPABASE_URL 和 SUPABASE_ANON_KEY。</div>
-      </div>
-
-      <!-- 用户名设置 -->
-      <div class="sync-section" id="syncUsernameSection">
-        <div class="sync-label">用户名</div>
-        <div class="sync-username-row">
-          <input type="text" class="sync-input" id="syncUsernameInput" placeholder="输入用户名以启用同步" maxlength="30">
-          <button class="sync-btn sync-btn-set" id="syncSetUsername">确认</button>
-        </div>
-        <div class="sync-hint" id="syncUsernameHint"></div>
-      </div>
-
-      <!-- 已登录状态 -->
-      <div class="sync-section" id="syncLoggedSection" style="display:none;">
-        <div class="sync-user-info">
-          <span class="sync-label">当前用户</span>
-          <span class="sync-username-display" id="syncUsernameDisplay"></span>
-          <button class="sync-btn-text" id="syncLogout">退出</button>
-        </div>
-      </div>
-
-      <!-- 同步操作 -->
-      <div class="sync-section" id="syncActionsSection" style="display:none;">
-        <div class="sync-actions">
-          <button class="sync-btn sync-btn-primary" id="syncSmartSync">🔄 智能同步</button>
-          <button class="sync-btn" id="syncPush">上传到云端</button>
-          <button class="sync-btn" id="syncPull">从云端拉取</button>
-        </div>
-        <div class="sync-hint">智能同步 = 合并本地与云端数据（推荐）</div>
-      </div>
-
-      <!-- 同步状态 -->
-      <div class="sync-section" id="syncStatusSection" style="display:none;">
-        <div class="sync-status" id="syncStatus"></div>
-        <div class="sync-last-time" id="syncLastTime"></div>
-      </div>
-
-      <!-- 自动同步开关 -->
-      <div class="sync-section" id="syncAutoSection" style="display:none;">
-        <label class="sync-auto-label">
-          <input type="checkbox" id="syncAutoToggle"> 自动同步（每30秒上传）
-        </label>
-      </div>
+  <!-- 每日身份验证弹窗 -->
+  <div class="overlay" id="dailyAuthOverlay">
+    <div class="daily-auth-dialog">
+      <div class="daily-auth-title">👋 欢迎回来</div>
+      <div class="daily-auth-desc">请输入用户名以启用同步</div>
+      <input type="text" class="daily-auth-input" id="dailyAuthInput" placeholder="输入用户名" maxlength="30" autocomplete="off">
+      <div class="daily-auth-hint" id="dailyAuthHint"></div>
+      <button class="daily-auth-btn" id="dailyAuthConfirm">确认</button>
     </div>
   </div>
+
+  <!-- 同步状态 toast -->
+  <div class="sync-toast" id="syncToast"></div>
 
   <!-- 科/属详情遮罩层 -->
   <div class="overlay" id="taxonomyOverlay">
@@ -666,7 +623,7 @@
       document.getElementById('cardFlipContainer').classList.remove('flipped');
       cardFlipped = false;
       document.getElementById('recOverlay').classList.remove('active');
-      document.getElementById('syncOverlay').classList.remove('active');
+      document.getElementById('dailyAuthOverlay').classList.remove('active');
       document.getElementById('taxonomyOverlay').classList.remove('active');
       document.getElementById('confirmOverlay').classList.remove('active');
       confirmCallback = null;
@@ -1068,15 +1025,11 @@
     // 初始化
     render();
 
-    // ========== 同步面板逻辑 ==========
+    // ========== 同步逻辑（简化版） ==========
     (function() {
-      var syncOverlay = document.getElementById('syncOverlay');
-      var syncUsernameInput = document.getElementById('syncUsernameInput');
-      var syncUsernameHint = document.getElementById('syncUsernameHint');
-      var syncUsernameDisplay = document.getElementById('syncUsernameDisplay');
-      var syncStatus = document.getElementById('syncStatus');
-      var syncLastTime = document.getElementById('syncLastTime');
-      var syncAutoToggle = document.getElementById('syncAutoToggle');
+      var SYNC_USERNAME = 'Leroy';
+      var DAILY_AUTH_KEY = 'sync_daily_auth';
+      var toastTimer = null;
 
       // 重建植物列表（从 localStorage 恢复后刷新界面）
       function rebuildPlantsFromStorage() {
@@ -1108,151 +1061,130 @@
           }
         });
         
-        // 替换全局植物列表
         plants.length = 0;
         newPlants.forEach(function(p) { plants.push(p); });
         render();
       }
 
+      // 显示 toast 提示
+      function showToast(message, type) {
+        var toast = document.getElementById('syncToast');
+        var icon = '';
+        if (type === 'syncing') icon = '⏳ ';
+        else if (type === 'success') icon = '✅ ';
+        else if (type === 'error') icon = '❌ ';
+        else if (type === 'info') icon = 'ℹ️ ';
+        
+        toast.textContent = icon + message;
+        toast.className = 'sync-toast sync-toast-show sync-toast-' + type;
+        
+        if (toastTimer) clearTimeout(toastTimer);
+        if (type !== 'syncing') {
+          toastTimer = setTimeout(function() {
+            toast.className = 'sync-toast';
+          }, 3000);
+        }
+      }
+
       // 配置 syncManager
       syncManager.configure({
         onStatus: function(info) {
-          var statusEl = document.getElementById('syncStatus');
-          var statusSection = document.getElementById('syncStatusSection');
-          statusSection.style.display = '';
-          
-          var icon = '';
-          var cls = '';
-          if (info.status === 'syncing') { icon = '⏳'; cls = 'sync-status-syncing'; }
-          else if (info.status === 'success') { icon = '✅'; cls = 'sync-status-success'; }
-          else if (info.status === 'error') { icon = '❌'; cls = 'sync-status-error'; }
-          else if (info.status === 'info') { icon = 'ℹ️'; cls = 'sync-status-info'; }
-          
-          statusEl.className = 'sync-status ' + cls;
-          statusEl.textContent = icon + ' ' + info.message;
-          
-          // 更新上次同步时间
-          var lastTime = syncManager.getLastSyncTime();
-          if (lastTime) {
-            syncLastTime.textContent = '上次同步：' + lastTime.toLocaleTimeString();
-          }
+          showToast(info.message, info.status);
         },
         onDataChange: function(zonePlants, boughtNames) {
-          // 云端数据已写入 localStorage，重建植物列表
           rebuildPlantsFromStorage();
         }
       });
 
-      // 更新面板 UI 状态
-      function updateSyncPanelUI() {
-        var configured = syncManager.isConfigured();
-        var username = syncManager.getUsername();
-        
-        document.getElementById('syncNotConfigured').style.display = configured ? 'none' : '';
-        
-        if (!configured) {
-          document.getElementById('syncUsernameSection').style.display = 'none';
-          document.getElementById('syncLoggedSection').style.display = 'none';
-          document.getElementById('syncActionsSection').style.display = 'none';
-          document.getElementById('syncAutoSection').style.display = 'none';
-          return;
-        }
-        
-        if (username) {
-          document.getElementById('syncUsernameSection').style.display = 'none';
-          document.getElementById('syncLoggedSection').style.display = '';
-          document.getElementById('syncActionsSection').style.display = '';
-          document.getElementById('syncAutoSection').style.display = '';
-          syncUsernameDisplay.textContent = username;
-        } else {
-          document.getElementById('syncUsernameSection').style.display = '';
-          document.getElementById('syncLoggedSection').style.display = 'none';
-          document.getElementById('syncActionsSection').style.display = 'none';
-          document.getElementById('syncAutoSection').style.display = 'none';
-        }
+      // 检查今日是否已验证
+      function isTodayAuthed() {
+        var saved = localStorage.getItem(DAILY_AUTH_KEY);
+        if (!saved) return false;
+        var today = new Date().toISOString().slice(0, 10);
+        return saved === today;
       }
 
-      // 打开同步面板
-      document.getElementById('btnSync').addEventListener('click', function() {
-        hideAllCards();
-        updateSyncPanelUI();
-        syncOverlay.classList.add('active');
-        if (!syncManager.getUsername()) {
-          syncUsernameInput.value = '';
-          syncUsernameInput.focus();
-        }
-      });
+      // 标记今日已验证
+      function markTodayAuthed() {
+        var today = new Date().toISOString().slice(0, 10);
+        localStorage.setItem(DAILY_AUTH_KEY, today);
+      }
 
-      // 关闭同步面板
-      document.getElementById('syncClose').addEventListener('click', function() {
-        syncOverlay.classList.remove('active');
-      });
-      syncOverlay.addEventListener('click', function(e) {
-        if (e.target === this) syncOverlay.classList.remove('active');
-      });
+      // 显示每日验证弹窗
+      function showDailyAuth() {
+        var overlay = document.getElementById('dailyAuthOverlay');
+        var input = document.getElementById('dailyAuthInput');
+        var hint = document.getElementById('dailyAuthHint');
+        input.value = '';
+        hint.textContent = '';
+        overlay.classList.add('active');
+        setTimeout(function() { input.focus(); }, 100);
+      }
 
-      // 设置用户名
-      document.getElementById('syncSetUsername').addEventListener('click', function() {
-        var name = syncUsernameInput.value.trim();
+      // 验证用户名
+      function verifyUsername() {
+        var input = document.getElementById('dailyAuthInput');
+        var hint = document.getElementById('dailyAuthHint');
+        var name = input.value.trim();
+        
         if (!name) {
-          syncUsernameHint.textContent = '请输入用户名';
-          syncUsernameHint.style.color = '#cc0000';
+          hint.textContent = '请输入用户名';
+          hint.style.color = '#cc0000';
           return;
         }
-        if (syncManager.setUsername(name)) {
-          syncUsernameHint.textContent = '';
-          updateSyncPanelUI();
-          // 自动执行一次智能同步
-          syncManager.smartSync().catch(function() {});
+        
+        if (name !== SYNC_USERNAME) {
+          hint.textContent = '用户名不正确';
+          hint.style.color = '#cc0000';
+          input.value = '';
+          input.focus();
+          return;
         }
+        
+        // 验证通过
+        markTodayAuthed();
+        syncManager.setUsername(SYNC_USERNAME);
+        document.getElementById('dailyAuthOverlay').classList.remove('active');
+        
+        // 验证通过后自动执行一次智能同步
+        syncManager.smartSync().catch(function() {});
+      }
+
+      // 验证按钮
+      document.getElementById('dailyAuthConfirm').addEventListener('click', verifyUsername);
+
+      // 回车确认
+      document.getElementById('dailyAuthInput').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') verifyUsername();
       });
 
-      // 回车确认用户名
-      syncUsernameInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          document.getElementById('syncSetUsername').click();
+      // 同步按钮：直接执行智能同步
+      document.getElementById('btnSync').addEventListener('click', function() {
+        if (!syncManager.isConfigured()) {
+          showToast('同步未配置', 'error');
+          return;
         }
-      });
-
-      // 退出登录
-      document.getElementById('syncLogout').addEventListener('click', function() {
-        syncManager.clearUsername();
-        syncAutoToggle.checked = false;
-        document.getElementById('syncStatusSection').style.display = 'none';
-        updateSyncPanelUI();
-      });
-
-      // 智能同步
-      document.getElementById('syncSmartSync').addEventListener('click', function() {
+        if (!isTodayAuthed()) {
+          showDailyAuth();
+          return;
+        }
+        // 确保用户名已设置
+        if (!syncManager.getUsername()) {
+          syncManager.setUsername(SYNC_USERNAME);
+        }
         syncManager.smartSync().catch(function() {});
       });
 
-      // 上传
-      document.getElementById('syncPush').addEventListener('click', function() {
-        syncManager.pushToCloud().catch(function() {});
-      });
-
-      // 拉取
-      document.getElementById('syncPull').addEventListener('click', function() {
-        syncManager.pullFromCloud().catch(function() {});
-      });
-
-      // 自动同步开关
-      syncAutoToggle.addEventListener('change', function() {
-        if (this.checked) {
-          syncManager.startAutoSync();
-        } else {
-          syncManager.stopAutoSync();
-        }
-      });
-
-      // 初始化 syncManager
+      // 初始化
       syncManager.init();
 
-      // 更新同步按钮上的用户名提示
-      var savedUsername = syncManager.getUsername();
-      if (savedUsername) {
-        document.getElementById('btnSync').title = '已登录：' + savedUsername;
+      // 页面加载时：如果今日未验证，弹出验证框
+      if (syncManager.isConfigured() && !isTodayAuthed()) {
+        // 延迟一点显示，等页面渲染完
+        setTimeout(showDailyAuth, 500);
+      } else if (isTodayAuthed() && !syncManager.getUsername()) {
+        // 今日已验证但用户名未设置（比如清了缓存），自动设置
+        syncManager.setUsername(SYNC_USERNAME);
       }
     })();
   </script>
