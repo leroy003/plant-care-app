@@ -16,7 +16,6 @@
         <h1>植物光照查询器</h1>
         <div class="header-buttons">
           <button class="btn-recommend" id="btnRecommend">推荐植物</button>
-          <button class="btn-recommend" id="btnSyncLink" style="background:#555;">同步链接</button>
         </div>
       </div>
       <p id="headerDesc">按光照条件将植物归类 / 共收录0种植物</p>
@@ -209,21 +208,7 @@
     </div>
   </div>
 
-  <!-- 同步链接弹窗 -->
-  <div class="overlay" id="syncOverlay">
-    <div class="card" style="max-width:460px;padding:24px;">
-      <div class="card-header" style="margin-bottom:16px;">
-        <h2 style="font-size:18px;">同步链接</h2>
-        <button class="card-close" id="syncClose">✕</button>
-      </div>
-      <p style="font-size:13px;color:#999;margin-bottom:8px;">在其他设备浏览器中打开此链接，即可同步你的操作数据：</p>
-      <p style="font-size:12px;color:#666;margin-bottom:12px;" id="syncStats"></p>
-      <textarea id="syncUrlBox" readonly style="width:100%;height:80px;border:1px solid #e5e5e5;border-radius:8px;padding:10px;font-size:12px;color:#333;resize:none;word-break:break-all;font-family:monospace;background:#f9f9f9;"></textarea>
-      <button id="syncCopy" style="margin-top:12px;width:100%;padding:10px 0;border:none;border-radius:20px;background:#333;color:#fff;font-size:14px;cursor:pointer;">复制链接</button>
-    </div>
-  </div>
-
-  <script src="recommend-data.js"></script>
+  <script src="plant-database.js"></script>
   <script>
     // 区域配置
     const zones = [
@@ -234,388 +219,22 @@
       { id: 5, label: '5', condition: '室外强光（南花园）' }
     ];
 
-    // 植物初始数据
-    const defaultPlants = [
-      {
-        name: '龙鳞春雨',
-        zone: 4,
-        family: '天南星科 / 林芋属 / 龙鳞春雨',
-        origin: '南美洲热带',
-        difficulty: 2,
-        light: '喜明亮散射光，忌强光直射',
-        temperature: '15-28°C，不耐寒',
-        humidity: '喜高湿，60%以上',
-        watering: '保持微润，忌积水，冬季减少',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气腐殖土，排水良好'
-      },
-      {
-        name: '风车茉莉',
-        zone: 5,
-        family: '夹竹桃科 / 络石属 / 风车茉莉',
-        origin: '中国、日本、朝鲜',
-        difficulty: 5,
-        light: '喜充足阳光，耐半阴，全日照开花更盛',
-        temperature: '-10~35°C，耐寒性强',
-        humidity: '适应性强，不挑湿度',
-        watering: '耐旱，土干浇透，忌长期积水',
-        fertilizer: '春季施1次缓释肥，花前追磷钾肥',
-        soil: '不挑土壤，疏松排水良好即可'
-      },
-      {
-        name: '鸭掌木',
-        zone: 3,
-        family: '五加科 / 鹅掌柴属 / 鸭掌木',
-        origin: '中国南部、东南亚',
-        difficulty: 5,
-        light: '耐阴性强，散射光或阴处均可',
-        temperature: '10-28°C，不耐严寒',
-        humidity: '适应性强，普通室内湿度即可',
-        watering: '土干浇透，冬季减少',
-        fertilizer: '生长期每月1次复合肥',
-        soil: '疏松肥沃排水良好的土壤'
-      },
-      {
-        name: '常春藤',
-        zone: 3,
-        family: '五加科 / 常春藤属 / 常春藤',
-        origin: '欧洲、北非、亚洲西部',
-        difficulty: 5,
-        light: '耐阴性极强，散射光或阴处均可',
-        temperature: '7-25°C，耐寒性好',
-        humidity: '喜湿润，干燥时叶尖易焦',
-        watering: '保持土壤微润，忌积水',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气的腐殖土'
-      },
-      {
-        name: '藤本月季',
-        zone: 5,
-        family: '蔷薇科 / 蔷薇属 / 藤本月季',
-        origin: '中国、欧洲',
-        difficulty: 2,
-        light: '喜强光，每天至少6小时直射光',
-        temperature: '15-28°C，可耐-15°C',
-        humidity: '适应性强，通风良好',
-        watering: '充分浇水，忌积水，花期需水多',
-        fertilizer: '生长期每2周施肥，重施磷钾肥',
-        soil: '肥沃疏松、排水良好的微酸性土壤'
-      },
-      {
-        name: '苦柑',
-        zone: 5,
-        family: '芸香科 / 柑橘属 / 苦柑',
-        origin: '中国南部、东南亚',
-        difficulty: 3,
-        light: '喜充足阳光，每天4-6小时直射光',
-        temperature: '15-30°C，低于-5°C易冻伤',
-        humidity: '喜湿润，适当喷雾',
-        watering: '保持土壤湿润，忌积水',
-        fertilizer: '生长期每月施1次有机肥',
-        soil: '疏松肥沃的微酸性土壤'
-      },
-      {
-        name: '狐尾天门冬',
-        zone: 1,
-        family: '天门冬科 / 天门冬属 / 狐尾天门冬',
-        origin: '南非',
-        difficulty: 4,
-        light: '喜明亮散射光，忌强光暴晒',
-        temperature: '15-28°C，低于5°C易冻伤',
-        humidity: '喜湿润环境，适当喷雾',
-        watering: '保持微润，忌积水',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气、排水良好的沙质土'
-      },
-      {
-        name: '蓝雪花',
-        zone: 5,
-        family: '蓝雪花科 / 蓝雪花属 / 蓝雪花',
-        origin: '南非',
-        difficulty: 3,
-        light: '喜充足阳光，全日照开花最盛',
-        temperature: '18-30°C，低于0°C地上冻死',
-        humidity: '适应性强',
-        watering: '夏季需水多，保持湿润',
-        fertilizer: '花期每2周施1次磷钾肥',
-        soil: '疏松肥沃、排水良好的土壤'
-      },
-      {
-        name: '绣球-无尽夏',
-        zone: 1,
-        family: '绣球花科 / 绣球属 / 无尽夏',
-        origin: '园艺品种（美国培育）',
-        difficulty: 3,
-        light: '喜半阴散射光，忌全日强光暴晒',
-        temperature: '15-25°C，可耐-20°C',
-        humidity: '喜湿润，需保持较高湿度',
-        watering: '保持湿润，夏季需水量大',
-        fertilizer: '花前施磷钾肥，调色用硫酸铝',
-        soil: '疏松肥沃的酸性土壤（pH5.5-6.5）'
-      },
-      {
-        name: '山桃草',
-        zone: 5,
-        family: '柳叶菜科 / 山桃草属 / 山桃草',
-        origin: '北美',
-        difficulty: 5,
-        light: '喜充足阳光，全日照开花最佳',
-        temperature: '15-30°C，可耐-15°C',
-        humidity: '耐干燥，适应性极强',
-        watering: '耐旱，土干浇透即可',
-        fertilizer: '春季施1次缓释肥即可',
-        soil: '耐贫瘠，排水良好即可'
-      },
-      {
-        name: '大花飞燕草',
-        zone: 5,
-        family: '毛茛科 / 飞燕草属 / 大花飞燕草',
-        origin: '中国、西伯利亚',
-        difficulty: 3,
-        light: '喜充足阳光，全日照开花最佳',
-        temperature: '10-25°C，可耐-15°C，不耐高温',
-        humidity: '喜适中湿度，忌高湿闷热',
-        watering: '保持微润，忌积水',
-        fertilizer: '生长期每2周施1次液肥',
-        soil: '疏松肥沃、排水良好的碱性土壤'
-      },
-      {
-        name: '绣线菊',
-        zone: 5,
-        family: '蔷薇科 / 绣线菊属 / 绣线菊',
-        origin: '中国、日本',
-        difficulty: 5,
-        light: '喜充足阳光，也耐半阴',
-        temperature: '10-28°C，可耐-25°C',
-        humidity: '适应性极强',
-        watering: '耐旱，土干浇透',
-        fertilizer: '春季施1次有机肥即可',
-        soil: '不挑土壤，排水良好即可'
-      },
-      {
-        name: '佛甲草',
-        zone: 5,
-        family: '景天科 / 景天属 / 佛甲草',
-        origin: '中国、日本、朝鲜',
-        difficulty: 5,
-        light: '喜充足阳光，全日照叶色金黄',
-        temperature: '10-30°C，可耐-10°C',
-        humidity: '耐干燥，适应力极强',
-        watering: '极耐旱，少浇水，忌积水',
-        fertilizer: '几乎不需施肥',
-        soil: '耐贫瘠，排水良好即可'
-      },
-      {
-        name: '八宝景天',
-        zone: 5,
-        family: '景天科 / 八宝属 / 八宝景天',
-        origin: '中国、日本、朝鲜',
-        difficulty: 5,
-        light: '喜充足阳光，全日照株型紧凑',
-        temperature: '10-28°C，可耐-20°C',
-        humidity: '耐干燥，适应力极强',
-        watering: '极耐旱，少浇水，忌积水',
-        fertilizer: '几乎不需施肥',
-        soil: '耐贫瘠，排水良好即可'
-      },
-      {
-        name: '蓝羊茅',
-        zone: 5,
-        family: '禾本科 / 羊茅属 / 蓝羊茅',
-        origin: '欧洲',
-        difficulty: 5,
-        light: '喜充足阳光，全日照叶色最蓝',
-        temperature: '10-25°C，可耐-30°C，不耐高温高湿',
-        humidity: '耐干燥，忌高湿',
-        watering: '极耐旱，少浇水',
-        fertilizer: '几乎不需施肥',
-        soil: '排水良好的砂质土壤'
-      },
-      {
-        name: '姬岩垂草',
-        zone: 5,
-        family: '玄参科 / 美人草属 / 姬岩垂草',
-        origin: '南美洲',
-        difficulty: 4,
-        light: '喜充足阳光，全日照开花最密',
-        temperature: '15-30°C，不太耐寒',
-        humidity: '适应性强',
-        watering: '保持微润，生长期需水多',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松肥沃、排水良好的土壤'
-      },
-      {
-        name: '矾根',
-        zone: 1,
-        family: '虎耳草科 / 矾根属 / 矾根',
-        origin: '北美洲',
-        difficulty: 3,
-        light: '喜半阴散射光，忌强光暴晒',
-        temperature: '10-25°C，可耐-20°C，不耐高温高湿',
-        humidity: '喜适中湿度',
-        watering: '保持微润，忌积水',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气、排水良好的中性土壤'
-      },
-      {
-        name: '大滨菊',
-        zone: 5,
-        family: '菊科 / 滨菊属 / 大滨菊',
-        origin: '欧洲',
-        difficulty: 5,
-        light: '喜充足阳光，全日照开花最佳',
-        temperature: '10-25°C，可耐-20°C，不耐高温',
-        humidity: '适应性强',
-        watering: '耐旱，土干浇透',
-        fertilizer: '春季施1次缓释肥即可',
-        soil: '不挑土壤，排水良好即可'
-      },
-      {
-        name: '龟背竹',
-        zone: 3,
-        family: '天南星科 / 龟背竹属 / 龟背竹',
-        origin: '墨西哥热带',
-        difficulty: 4,
-        light: '喜明亮散射光，忌强光直射，耐阴',
-        temperature: '15-28°C，低于5°C易冻伤',
-        humidity: '喜高湿，60%以上为佳',
-        watering: '保持微润，忌积水，冬季减少',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气的腐殖土，排水良好'
-      },
-      {
-        name: '吊竹梅',
-        zone: 2,
-        family: '鸭跖草科 / 紫露草属 / 吊竹梅',
-        origin: '墨西哥',
-        difficulty: 5,
-        light: '喜明亮散射光，光足叶色更紫',
-        temperature: '15-28°C，低于5°C易冻伤',
-        humidity: '喜湿润环境',
-        watering: '保持微润，生长期多浇',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松肥沃的腐殖土'
-      },
-      {
-        name: '发财树',
-        zone: 3,
-        family: '木棉科 / 瓜栗属 / 发财树',
-        origin: '中美洲、墨西哥',
-        difficulty: 3,
-        light: '喜明亮散射光，耐半阴，忌强光',
-        temperature: '18-30°C，低于5°C易冻伤',
-        humidity: '适应性强，普通室内湿度即可',
-        watering: '宁干勿湿，极怕积水烂根',
-        fertilizer: '生长期每月1次稀薄液肥',
-        soil: '疏松透气、排水良好的砂质土'
-      },
-      {
-        name: '蟹爪莲',
-        zone: 2,
-        family: '仙人掌科 / 蟹爪兰属 / 蟹爪莲',
-        origin: '巴西热带雨林',
-        difficulty: 3,
-        light: '喜明亮散射光，忌强光，短日照促花',
-        temperature: '15-25°C，低于5°C易冻伤',
-        humidity: '喜适中湿度，忌过干',
-        watering: '保持微润，花期适当控水',
-        fertilizer: '生长期每月1次磷钾肥',
-        soil: '疏松透气的腐殖土，微酸性'
-      },
-      {
-        name: '三角梅',
-        zone: 5,
-        family: '紫茉莉科 / 叶子花属 / 三角梅',
-        origin: '南美洲巴西',
-        difficulty: 3,
-        light: '喜强光，每天至少6小时直射光',
-        temperature: '15-30°C，低于5°C易冻伤',
-        humidity: '耐干燥，适应性强',
-        watering: '控水促花，适当干旱刺激开花',
-        fertilizer: '花期每2周施1次磷钾肥',
-        soil: '疏松透气、排水良好的土壤'
-      },
-      {
-        name: '黄花梨',
-        zone: 5,
-        family: '豆科 / 黄檀属 / 黄花梨',
-        origin: '中国海南、越南',
-        difficulty: 3,
-        light: '阳性树种，喜充足阳光，全日照生长最佳',
-        temperature: '22-28°C，极端低温不低于6°C，不耐寒',
-        humidity: '喜湿润环境，适当喷水保湿',
-        watering: '生长期保持湿润，4-5天浇一次，忌积水',
-        fertilizer: '春秋各施1次氮磷钾复合肥',
-        soil: '肥沃微酸性土壤，腐殖质丰富，排水良好'
-      },
-      {
-        name: '铜钱草',
-        zone: 4,
-        family: '伞形科 / 天胡荽属 / 铜钱草',
-        origin: '热带及亚热带地区',
-        difficulty: 5,
-        light: '喜充足阳光，半阴亦可',
-        temperature: '15-28°C，不耐寒',
-        humidity: '喜湿润，可半水培',
-        watering: '保持湿润或水培，忌干旱',
-        fertilizer: '每月1次水溶肥',
-        soil: '不挑土，半水半土最佳'
-      },
-      {
-        name: '南天竹',
-        zone: 1,
-        family: '小檗科 / 南天竹属 / 南天竹',
-        origin: '中国、日本',
-        difficulty: 4,
-        light: '喜半阴散射光，耐阴性好，忌强光暴晒',
-        temperature: '10-25°C，可耐-10°C，耐寒性较强',
-        humidity: '喜湿润环境，适应性较强',
-        watering: '保持土壤湿润，忌积水，冬季减少',
-        fertilizer: '春秋各施1次有机肥或复合肥',
-        soil: '疏松肥沃、排水良好的微酸性土壤'
-      },
-      {
-        name: '向日葵',
-        zone: 5,
-        family: '菊科 / 向日葵属 / 向日葵',
-        origin: '北美洲',
-        difficulty: 4,
-        light: '喜充足阳光，每天至少6小时直射光',
-        temperature: '18-30°C，可耐短期低温，不耐霜冻',
-        humidity: '适应性强，耐干燥',
-        watering: '生长期需水量大，保持湿润，忌积水',
-        fertilizer: '生长期每2周施1次复合肥，现蕾后增施磷钾肥',
-        soil: '疏松肥沃、排水良好的砂质土壤'
-      }
-    ];
-
     // ========== 数据持久化（localStorage） ==========
-    var STORAGE_KEY_DELETED = 'plant_deleted_names';
-    var STORAGE_KEY_ADDED = 'plant_added_list';
+    // STORAGE_KEY_ZONE_PLANTS: 存储当前在5区域内显示的植物 [{name, zone}]
+    var STORAGE_KEY_ZONE_PLANTS = 'plant_zone_list';
     var STORAGE_KEY_BOUGHT = 'plant_bought_names';
 
-    // 读取已删除的植物名单（黑名单）
-    function getDeletedNames() {
+    // 读取当前区域内的植物列表
+    function getZonePlants() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY_DELETED)) || [];
-      } catch(e) { return []; }
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_ZONE_PLANTS)) || null;
+      } catch(e) { return null; }
     }
 
-    // 保存已删除的植物名单
-    function saveDeletedNames(names) {
-      localStorage.setItem(STORAGE_KEY_DELETED, JSON.stringify(names));
-    }
-
-    // 读取已添加的推荐植物
-    function getAddedPlants() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY_ADDED)) || [];
-      } catch(e) { return []; }
-    }
-
-    // 保存已添加的推荐植物
-    function saveAddedPlants(list) {
-      localStorage.setItem(STORAGE_KEY_ADDED, JSON.stringify(list));
+    // 保存当前区域内的植物列表
+    function saveZonePlants(list) {
+      var simplified = list.map(function(p) { return { name: p.name, zone: p.zone }; });
+      localStorage.setItem(STORAGE_KEY_ZONE_PLANTS, JSON.stringify(simplified));
     }
 
     // 读取已购植物名单
@@ -630,92 +249,68 @@
       localStorage.setItem(STORAGE_KEY_BOUGHT, JSON.stringify(names));
     }
 
-    // ========== URL 参数同步（跨设备） ==========
-    // 将 localStorage 数据编码为 URL 安全字符串
-    function encodeSyncData() {
-      var data = {
-        d: getDeletedNames(),    // deleted
-        a: getAddedPlants(),     // added
-        b: getBoughtNames()      // bought
-      };
-      // 简化已添加植物数据，只保留必要字段
-      data.a = data.a.map(function(p) {
-        return {n:p.name, z:p.zone, f:p.family, o:p.origin, di:p.difficulty,
-                l:p.light, t:p.temperature, h:p.humidity, w:p.watering,
-                fe:p.fertilizer, s:p.soil};
-      });
-      var json = JSON.stringify(data);
-      // 用 btoa 编码（需先转 URI 编码以支持中文）
-      try {
-        return btoa(encodeURIComponent(json));
-      } catch(e) { return ''; }
+    // 从植物库中查找完整数据
+    function findInDatabase(name) {
+      return plantDatabase.find(function(p) { return p.name === name; });
     }
 
-    // 从 URL 安全字符串解码同步数据
-    function decodeSyncData(encoded) {
-      try {
-        var json = decodeURIComponent(atob(encoded));
-        var data = JSON.parse(json);
-        return data;
-      } catch(e) { return null; }
-    }
-
-    // 还原简化后的植物数据
-    function restoreAddedPlant(p) {
-      return {name:p.n, zone:p.z, family:p.f, origin:p.o, difficulty:p.di,
-              light:p.l, temperature:p.t, humidity:p.h, watering:p.w,
-              fertilizer:p.fe, soil:p.s};
-    }
-
-    // 页面加载时检查 URL hash 是否包含同步数据
-    function checkUrlSync() {
-      var hash = window.location.hash;
-      if (hash && hash.indexOf('#sync=') === 0) {
-        var encoded = hash.substring(6);
-        var data = decodeSyncData(encoded);
-        if (data) {
-          // 导入到 localStorage
-          if (data.d && data.d.length) saveDeletedNames(data.d);
-          if (data.a && data.a.length) {
-            var restored = data.a.map(restoreAddedPlant);
-            saveAddedPlants(restored);
-          }
-          if (data.b && data.b.length) saveBoughtNames(data.b);
-          // 清除 URL 中的 hash，避免重复导入
-          history.replaceState(null, '', window.location.pathname + window.location.search);
-          return true;
-        }
-      }
-      return false;
-    }
-
-    var syncImported = checkUrlSync();
-
-    // 初始化 plants：默认数据（去掉已删除的）+ 已添加的推荐植物
+    // 初始化：首次使用加载默认27种植物，之后从 localStorage 恢复
     function initPlants() {
-      var deletedNames = getDeletedNames();
-      var addedPlants = getAddedPlants();
+      var savedZonePlants = getZonePlants();
       var boughtNames = getBoughtNames();
+      var result = [];
 
-      var filtered = defaultPlants.filter(function(p) {
-        return deletedNames.indexOf(p.name) === -1;
-      });
-
-      addedPlants.forEach(function(ap) {
-        if (deletedNames.indexOf(ap.name) === -1 &&
-            !filtered.some(function(p) { return p.name === ap.name; })) {
-          filtered.push(ap);
-        }
-      });
+      if (savedZonePlants === null) {
+        // 首次使用：加载所有 isDefault=true 的植物到对应区域
+        plantDatabase.forEach(function(p) {
+          if (p.isDefault) {
+            result.push({
+              name: p.name,
+              zone: p.defaultZone,
+              family: p.family,
+              origin: p.origin,
+              difficulty: p.difficulty,
+              light: p.light,
+              temperature: p.temperature,
+              humidity: p.humidity,
+              watering: p.watering,
+              fertilizer: p.fertilizer,
+              soil: p.soil
+            });
+          }
+        });
+        // 保存初始状态
+        saveZonePlants(result);
+      } else {
+        // 从 localStorage 恢复：用保存的 name+zone 去植物库查完整数据
+        savedZonePlants.forEach(function(sp) {
+          var dbPlant = findInDatabase(sp.name);
+          if (dbPlant) {
+            result.push({
+              name: dbPlant.name,
+              zone: sp.zone,
+              family: dbPlant.family,
+              origin: dbPlant.origin,
+              difficulty: dbPlant.difficulty,
+              light: dbPlant.light,
+              temperature: dbPlant.temperature,
+              humidity: dbPlant.humidity,
+              watering: dbPlant.watering,
+              fertilizer: dbPlant.fertilizer,
+              soil: dbPlant.soil
+            });
+          }
+        });
+      }
 
       // 恢复已购状态
-      filtered.forEach(function(p) {
+      result.forEach(function(p) {
         if (boughtNames.indexOf(p.name) !== -1) {
           p.bought = true;
         }
       });
 
-      return filtered;
+      return result;
     }
 
     var plants = initPlants();
@@ -973,15 +568,9 @@
         ' / ' + speciesName;
     }
 
-    // 获取所有植物数据源（主列表 + 推荐池去重）
+    // 获取所有植物数据源（直接使用统一植物库）
     function getAllPlantSources() {
-      var all = plants.slice();
-      recommendPool.forEach(function(rp) {
-        if (!all.some(function(p) { return p.name === rp.name; })) {
-          all.push(rp);
-        }
-      });
-      return all;
+      return plantDatabase;
     }
 
     // ========== 自定义确认对话框 ==========
@@ -1020,7 +609,6 @@
       document.getElementById('recOverlay').classList.remove('active');
       document.getElementById('taxonomyOverlay').classList.remove('active');
       document.getElementById('confirmOverlay').classList.remove('active');
-      document.getElementById('syncOverlay').classList.remove('active');
       confirmCallback = null;
     }
 
@@ -1216,7 +804,7 @@
       });
 
       // 更新标题描述中的植物数量
-      document.getElementById('headerDesc').textContent = '按光照条件将植物归类 / 共收录' + plants.length + '种植物';
+      document.getElementById('headerDesc').textContent = '按光照条件将植物归类 / 区域内' + plants.length + '种 · 植物库共' + plantDatabase.length + '种';
     }
 
     // 当前查看的植物
@@ -1268,19 +856,8 @@
         if (idx > -1) {
           plants.splice(idx, 1);
 
-          // 记录到已删除黑名单
-          var deletedNames = getDeletedNames();
-          if (deletedNames.indexOf(plantName) === -1) {
-            deletedNames.push(plantName);
-            saveDeletedNames(deletedNames);
-          }
-
-          // 同时从已添加列表中移除（如果有的话）
-          var addedPlants = getAddedPlants();
-          var newAdded = addedPlants.filter(function(p) { return p.name !== plantName; });
-          if (newAdded.length !== addedPlants.length) {
-            saveAddedPlants(newAdded);
-          }
+          // 同步到 localStorage（直接保存当前区域内的植物列表）
+          saveZonePlants(plants);
 
           hideCard();
           render();
@@ -1301,6 +878,7 @@
           boughtNames = boughtNames.filter(function(n) { return n !== currentPlant.name; });
         }
         saveBoughtNames(boughtNames);
+        saveZonePlants(plants);
 
         hideCard();
         render();
@@ -1313,16 +891,19 @@
     });
 
     // ========== 推荐植物功能 ==========
-    // recommendPool 数据来自外部文件 recommend-data.js（200种植物）
+    // 从统一植物库中随机推荐，排除已在5区域内显示的植物
 
     var currentRecPlant = null;
 
-    // 随机获取一个推荐植物（排除已在列表中的）
+    // 随机获取一个推荐植物（排除已在区域内显示的）
     function getRandomRecommend() {
-      var available = recommendPool.filter(function(rp) {
-        return !plants.some(function(p) { return p.name === rp.name; });
+      var available = plantDatabase.filter(function(dbp) {
+        return !plants.some(function(p) { return p.name === dbp.name; });
       });
-      if (available.length === 0) available = recommendPool;
+      if (available.length === 0) {
+        // 所有植物都已在区域中，从全库随机
+        available = plantDatabase;
+      }
       return available[Math.floor(Math.random() * available.length)];
     }
 
@@ -1347,7 +928,7 @@
       var radiosHTML = '';
       zones.forEach(function(zone) {
         radiosHTML += '<label><input type="radio" name="recZone" value="' + zone.id + '"' +
-          (zone.id === plant.recZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
+          (zone.id === plant.defaultZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
       });
       document.getElementById('recZoneRadios').innerHTML = radiosHTML;
 
@@ -1380,7 +961,7 @@
 
       // 检查是否已存在
       if (plants.some(function(p) { return p.name === currentRecPlant.name; })) {
-        showConfirmDialog('「' + currentRecPlant.name + '」已在列表中', function() {});
+        showConfirmDialog('「' + currentRecPlant.name + '」已在区域列表中', function() {});
         document.getElementById('confirmOk').textContent = '知道了';
         document.getElementById('confirmCancel').style.display = 'none';
         return;
@@ -1402,20 +983,8 @@
 
       plants.push(newPlant);
 
-      // 保存到已添加列表
-      var addedPlants = getAddedPlants();
-      // 避免重复
-      if (!addedPlants.some(function(p) { return p.name === newPlant.name; })) {
-        addedPlants.push(newPlant);
-        saveAddedPlants(addedPlants);
-      }
-
-      // 从删除黑名单中移除（如果之前删除过又重新添加）
-      var deletedNames = getDeletedNames();
-      var newDeleted = deletedNames.filter(function(n) { return n !== newPlant.name; });
-      if (newDeleted.length !== deletedNames.length) {
-        saveDeletedNames(newDeleted);
-      }
+      // 保存到 localStorage
+      saveZonePlants(plants);
 
       hideRecCard();
       render();
@@ -1435,78 +1004,6 @@
         hideTaxonomyCard();
       }
     });
-
-    // ========== 同步链接功能 ==========
-    document.getElementById('btnSyncLink').addEventListener('click', function() {
-      var encoded = encodeSyncData();
-      if (!encoded) {
-        showConfirmDialog('暂无可同步的数据', function() {});
-        document.getElementById('confirmOk').textContent = '知道了';
-        document.getElementById('confirmCancel').style.display = 'none';
-        return;
-      }
-      var syncUrl = window.location.origin + window.location.pathname + '#sync=' + encoded;
-
-      // 检查 URL 长度
-      if (syncUrl.length > 8000) {
-        showConfirmDialog('数据量较大（' + Math.round(syncUrl.length/1024) + 'KB），链接可能在某些浏览器中无法完整传递。建议减少数据量后再试。', function() {});
-        document.getElementById('confirmOk').textContent = '知道了';
-        document.getElementById('confirmCancel').style.display = 'none';
-        return;
-      }
-
-      // 显示同步链接弹窗
-      document.getElementById('syncOverlay').classList.add('active');
-      var urlBox = document.getElementById('syncUrlBox');
-      urlBox.value = syncUrl;
-      urlBox.select();
-
-      // 统计信息
-      var deletedCount = getDeletedNames().length;
-      var addedCount = getAddedPlants().length;
-      var boughtCount = getBoughtNames().length;
-      document.getElementById('syncStats').textContent =
-        '已删除 ' + deletedCount + ' 种 · 已添加 ' + addedCount + ' 种 · 已购 ' + boughtCount + ' 种';
-    });
-
-    // 复制按钮
-    document.getElementById('syncCopy').addEventListener('click', function() {
-      var urlBox = document.getElementById('syncUrlBox');
-      urlBox.select();
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(urlBox.value).then(function() {
-          document.getElementById('syncCopy').textContent = '已复制 ✓';
-          setTimeout(function() {
-            document.getElementById('syncCopy').textContent = '复制链接';
-          }, 2000);
-        });
-      } else {
-        document.execCommand('copy');
-        document.getElementById('syncCopy').textContent = '已复制 ✓';
-        setTimeout(function() {
-          document.getElementById('syncCopy').textContent = '复制链接';
-        }, 2000);
-      }
-    });
-
-    // 关闭同步弹窗
-    document.getElementById('syncClose').addEventListener('click', function() {
-      document.getElementById('syncOverlay').classList.remove('active');
-    });
-    document.getElementById('syncOverlay').addEventListener('click', function(e) {
-      if (e.target === this) {
-        document.getElementById('syncOverlay').classList.remove('active');
-      }
-    });
-
-    // 如果是通过同步链接导入的，显示提示
-    if (syncImported) {
-      setTimeout(function() {
-        showConfirmDialog('已从同步链接导入数据 ✓', function() {});
-        document.getElementById('confirmOk').textContent = '知道了';
-        document.getElementById('confirmCancel').style.display = 'none';
-      }, 500);
-    }
 
     // 初始化
     render();
