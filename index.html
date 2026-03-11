@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=39">
+  <link rel="stylesheet" href="style.css?v=40">
 </head>
 <body>
 
@@ -202,7 +202,6 @@
       <div class="daily-auth-title">👋 欢迎回来</div>
       <div class="daily-auth-desc">请输入用户名以启用同步</div>
       <input type="text" class="daily-auth-input" id="dailyAuthInput" placeholder="输入用户名" maxlength="30" autocomplete="off">
-      <div class="daily-auth-hint" id="dailyAuthHint"></div>
       <button class="daily-auth-btn" id="dailyAuthConfirm">确认</button>
     </div>
   </div>
@@ -1114,9 +1113,7 @@
       function showDailyAuth() {
         var overlay = document.getElementById('dailyAuthOverlay');
         var input = document.getElementById('dailyAuthInput');
-        var hint = document.getElementById('dailyAuthHint');
         input.value = '';
-        hint.textContent = '';
         overlay.classList.add('active');
         setTimeout(function() { input.focus(); }, 100);
       }
@@ -1124,18 +1121,15 @@
       // 验证用户名
       function verifyUsername() {
         var input = document.getElementById('dailyAuthInput');
-        var hint = document.getElementById('dailyAuthHint');
+        var dialog = document.querySelector('.daily-auth-dialog');
         var name = input.value.trim();
         
-        if (!name) {
-          hint.textContent = '请输入用户名';
-          hint.style.color = '#cc0000';
-          return;
-        }
-        
-        if (name !== SYNC_USERNAME) {
-          hint.textContent = '用户名不正确';
-          hint.style.color = '#cc0000';
+        if (!name || name !== SYNC_USERNAME) {
+          // 验证不正确，弹窗抖动
+          dialog.classList.remove('shake');
+          // 强制重排以重新触发动画
+          void dialog.offsetWidth;
+          dialog.classList.add('shake');
           input.value = '';
           input.focus();
           return;

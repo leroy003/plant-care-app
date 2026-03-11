@@ -644,6 +644,7 @@ body {
   background: #fafafa;
   box-sizing: border-box;
   text-align: center;
+  margin-bottom: 16px;
 }
 
 .daily-auth-input:focus {
@@ -653,14 +654,6 @@ body {
 
 .daily-auth-input::placeholder {
   color: #cccccc;
-}
-
-.daily-auth-hint {
-  font-size: 12px;
-  min-height: 18px;
-  margin-top: 6px;
-  margin-bottom: 6px;
-  color: var(--color-gray);
 }
 
 .daily-auth-btn {
@@ -679,6 +672,17 @@ body {
 .daily-auth-btn:hover {
   color: #000000;
   border-color: #333333;
+}
+
+/* Shake animation for auth dialog */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 50%, 90% { transform: translateX(-6px); }
+  30%, 70% { transform: translateX(6px); }
+}
+
+.daily-auth-dialog.shake {
+  animation: shake 0.4s ease;
 }
 
 /* ========== Sync Toast ========== */
