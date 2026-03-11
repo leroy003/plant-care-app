@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=40">
+  <link rel="stylesheet" href="style.css?v=47">
 </head>
 <body>
 
@@ -199,9 +199,11 @@
   <!-- 每日身份验证弹窗 -->
   <div class="overlay" id="dailyAuthOverlay">
     <div class="daily-auth-dialog">
-      <div class="daily-auth-title">👋 欢迎回来</div>
-      <div class="daily-auth-desc">请输入用户名以启用同步</div>
-      <input type="text" class="daily-auth-input" id="dailyAuthInput" placeholder="输入用户名" maxlength="30" autocomplete="off">
+      <div class="daily-auth-title">你朋友的名字叫*杨</div>
+      <div class="daily-auth-input-wrap" id="dailyAuthInputWrap">
+        <input type="text" class="daily-auth-input" id="dailyAuthInput" placeholder="" maxlength="30" autocomplete="off">
+        <span class="daily-auth-caret" id="dailyAuthCaret"></span>
+      </div>
       <button class="daily-auth-btn" id="dailyAuthConfirm">确认</button>
     </div>
   </div>
@@ -1115,7 +1117,11 @@
         var input = document.getElementById('dailyAuthInput');
         input.value = '';
         overlay.classList.add('active');
-        setTimeout(function() { input.focus(); }, 100);
+        caretEl.classList.add('active');
+        updateCaretPosition();
+        setTimeout(function() {
+          input.focus();
+        }, 100);
       }
 
       // 验证用户名
@@ -1132,6 +1138,7 @@
           dialog.classList.add('shake');
           input.value = '';
           input.focus();
+          updateCaretPosition();
           return;
         }
         
@@ -1151,6 +1158,40 @@
       document.getElementById('dailyAuthInput').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') verifyUsername();
       });
+
+      // 闪烁光标定位
+      var caretEl = document.getElementById('dailyAuthCaret');
+      var authInput = document.getElementById('dailyAuthInput');
+
+      function updateCaretPosition() {
+        var text = authInput.value;
+        // 用临时 canvas 测量文本宽度
+        var canvas = document.createElement('canvas');
+        var ctx = canvas.getContext('2d');
+        var style = window.getComputedStyle(authInput);
+        ctx.font = style.fontSize + ' ' + style.fontFamily;
+        var textWidth = ctx.measureText(text).width;
+        var inputWidth = authInput.offsetWidth;
+        // text-align: center, 光标在文字右边
+        var left = (inputWidth / 2) + (textWidth / 2);
+        caretEl.style.left = left + 'px';
+      }
+
+      authInput.addEventListener('focus', function() {
+        caretEl.classList.add('active');
+        updateCaretPosition();
+      });
+
+      authInput.addEventListener('blur', function() {
+        // 弹窗显示期间保持光标闪烁
+        var overlay = document.getElementById('dailyAuthOverlay');
+        if (!overlay.classList.contains('active')) {
+          caretEl.classList.remove('active');
+        }
+      });
+
+      authInput.addEventListener('input', updateCaretPosition);
+      authInput.addEventListener('keyup', updateCaretPosition);
 
       // 同步按钮：将本地当前状态上传到云端（覆盖）
       document.getElementById('btnSync').addEventListener('click', function() {
