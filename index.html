@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 植物养护助手</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <nav class="navbar">
+        <div class="nav-brand">🌿 植物养护助手</div>
+        <div class="nav-links">
+            <a href="#home" class="nav-link active" data-section="home">首页</a>
+            <a href="#plants" class="nav-link" data-section="plants">我的植物</a>
+            <a href="#guide" class="nav-link" data-section="guide">养护指南</a>
+            <a href="#calendar" class="nav-link" data-section="calendar">浇水日历</a>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="切换主题">🌙</button>
+    </nav>
+
+    <!-- 首页 -->
+    <section id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>用心呵护每一株绿色生命 🌱</h1>
+                <p>记录你的植物、获取养护建议、设置浇水提醒，让每一棵植物都茁壮成长</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-number" id="totalPlants">0</span>
+                        <span class="stat-label">我的植物</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="needWater">0</span>
+                        <span class="stat-label">需要浇水</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number" id="healthyCount">0</span>
+                        <span class="stat-label">状态良好</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-lg" onclick="showSection('plants'); openAddModal()">
+                    ➕ 添加我的第一株植物
+                </button>
+            </div>
+            <div class="hero-illustration">
+                <div class="plant-scene">
+                    <div class="plant-pot plant-pot-1">🪴</div>
+                    <div class="plant-pot plant-pot-2">🌵</div>
+                    <div class="plant-pot plant-pot-3">🌻</div>
+                    <div class="plant-pot plant-pot-4">🌺</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日任务 -->
+        <div class="container">
+            <h2 class="section-title">📋 今日任务</h2>
+            <div id="todayTasks" class="task-list">
+                <div class="empty-state">
+                    <span class="empty-icon">✨</span>
+                    <p>今天没有待办任务，享受美好的一天吧！</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 养护小贴士 -->
+        <div class="container">
+            <h2 class="section-title">💡 养护小贴士</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">💧</div>
+                    <h3>浇水技巧</h3>
+                    <p>浇水前先摸摸土壤，表面 2-3 厘米干燥时再浇水。宁干勿湿，避免根部腐烂。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">☀️</div>
+                    <h3>光照管理</h3>
+                    <p>大多数室内植物喜欢明亮的散射光。避免夏季正午直射阳光灼伤叶片。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🌡️</div>
+                    <h3>温度控制</h3>
+                    <p>多数室内植物适宜温度 18-28°C。冬季注意远离暖气片和冷风口。</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon">🧪</div>
+                    <h3>施肥要点</h3>
+                    <p>生长季节（春夏）每 2-4 周施一次稀释液肥。冬季休眠期减少或停止施肥。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 我的植物 -->
+    <section id="plants" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">🌱 我的植物</h2>
+                <div class="section-actions">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索植物..." oninput="filterPlants()">
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddModal()">➕ 添加植物</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="needWater">需浇水 💧</button>
+                <button class="filter-btn" data-filter="healthy">状态良好 ✅</button>
+                <button class="filter-btn" data-filter="attention">需关注 ⚠️</button>
+            </div>
+            <div id="plantGrid" class="plant-grid">
+                <div class="empty-state">
+                    <span class="empty-icon">🌱</span>
+                    <p>还没有植物，点击上方按钮添加第一株吧！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 养护指南 -->
+    <section id="guide" class="section">
+        <div class="container">
+            <h2 class="section-title">📚 养护指南</h2>
+            <div class="guide-grid">
+                <div class="guide-card" onclick="showGuideDetail('monstera')">
+                    <div class="guide-emoji">🌿</div>
+                    <h3>龟背竹</h3>
+                    <p>热带雨林植物，喜湿润半阴环境</p>
+                    <span class="difficulty easy">🟢 容易</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('succulent')">
+                    <div class="guide-emoji">🌵</div>
+                    <h3>多肉植物</h3>
+                    <p>耐旱好养，适合新手入门</p>
+                    <span class="difficulty easy">🟢 容易</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('orchid')">
+                    <div class="guide-emoji">🌸</div>
+                    <h3>蝴蝶兰</h3>
+                    <p>高雅美丽，需要适当养护</p>
+                    <span class="difficulty medium">🟡 中等</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('rose')">
+                    <div class="guide-emoji">🌹</div>
+                    <h3>月季/玫瑰</h3>
+                    <p>花中皇后，需要精心照料</p>
+                    <span class="difficulty hard">🔴 较难</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('bindweed')">
+                    <div class="guide-emoji">🍀</div>
+                    <h3>绿萝</h3>
+                    <p>净化空气好帮手，超级好养</p>
+                    <span class="difficulty easy">🟢 容易</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('ficus')">
+                    <div class="guide-emoji">🌳</div>
+                    <h3>琴叶榕</h3>
+                    <p>网红植物，大气典雅</p>
+                    <span class="difficulty medium">🟡 中等</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('jasmine')">
+                    <div class="guide-emoji">🤍</div>
+                    <h3>茉莉花</h3>
+                    <p>清香怡人，喜阳光充足</p>
+                    <span class="difficulty medium">🟡 中等</span>
+                </div>
+                <div class="guide-card" onclick="showGuideDetail('cactus')">
+                    <div class="guide-emoji">🌵</div>
+                    <h3>仙人掌</h3>
+                    <p>超级耐旱，懒人首选</p>
+                    <span class="difficulty easy">🟢 容易</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 指南详情弹窗 -->
+        <div id="guideModal" class="modal" style="display:none">
+            <div class="modal-content modal-lg">
+                <div class="modal-header">
+                    <h2 id="guideTitle"></h2>
+                    <button class="modal-close" onclick="closeGuideModal()">✕</button>
+                </div>
+                <div id="guideBody" class="guide-detail"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 浇水日历 -->
+    <section id="calendar" class="section">
+        <div class="container">
+            <h2 class="section-title">📅 浇水日历</h2>
+            <div class="calendar-header">
+                <button class="btn btn-icon" onclick="changeMonth(-1)">◀</button>
+                <h3 id="calendarTitle"></h3>
+                <button class="btn btn-icon" onclick="changeMonth(1)">▶</button>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day-header">一</div>
+                <div class="calendar-day-header">二</div>
+                <div class="calendar-day-header">三</div>
+                <div class="calendar-day-header">四</div>
+                <div class="calendar-day-header">五</div>
+                <div class="calendar-day-header">六</div>
+                <div class="calendar-day-header">日</div>
+                <div id="calendarDays"></div>
+            </div>
+            <div class="calendar-legend">
+                <span class="legend-item"><span class="legend-dot watered"></span> 已浇水</span>
+                <span class="legend-item"><span class="legend-dot scheduled"></span> 计划浇水</span>
+                <span class="legend-item"><span class="legend-dot today"></span> 今天</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 添加/编辑植物弹窗 -->
+    <div id="plantModal" class="modal" style="display:none">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加植物</h2>
+                <button class="modal-close" onclick="closePlantModal()">✕</button>
+            </div>
+            <form id="plantForm" onsubmit="savePlant(event)">
+                <div class="form-group">
+                    <label>植物名称 *</label>
+                    <input type="text" id="plantName" required placeholder="例如：我的小绿萝">
+                </div>
+                <div class="form-group">
+                    <label>植物种类</label>
+                    <select id="plantType">
+                        <option value="monstera">🌿 龟背竹</option>
+                        <option value="succulent">🌵 多肉植物</option>
+                        <option value="orchid">🌸 蝴蝶兰</option>
+                        <option value="rose">🌹 月季/玫瑰</option>
+                        <option value="bindweed">🍀 绿萝</option>
+                        <option value="ficus">🌳 琴叶榕</option>
+                        <option value="jasmine">🤍 茉莉花</option>
+                        <option value="cactus">🌵 仙人掌</option>
+                        <option value="other">🌱 其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>放置位置</label>
+                    <input type="text" id="plantLocation" placeholder="例如：客厅窗台">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>浇水频率（天）</label>
+                        <input type="number" id="waterFreq" min="1" max="90" value="7">
+                    </div>
+                    <div class="form-group">
+                        <label>上次浇水日期</label>
+                        <input type="date" id="lastWatered">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>备注</label>
+                    <textarea id="plantNote" placeholder="记录一些养护心得..."></textarea>
+                </div>
+                <input type="hidden" id="plantId">
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closePlantModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <p>🌿 植物养护助手 — 用心呵护每一株绿色生命</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
