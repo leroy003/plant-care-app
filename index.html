@@ -1146,7 +1146,8 @@
         syncManager.setUsername(SYNC_USERNAME);
         document.getElementById('dailyAuthOverlay').classList.remove('active');
         
-        // 验证通过，等待用户主动点击同步按钮
+        // 每日首次验证后，从云端拉取最新数据刷新页面
+        syncManager.pullFromCloud().catch(function() {});
       }
 
       // 验证按钮
@@ -1181,9 +1182,13 @@
       if (syncManager.isConfigured() && !isTodayAuthed()) {
         // 延迟一点显示，等页面渲染完
         setTimeout(showDailyAuth, 500);
-      } else if (isTodayAuthed() && !syncManager.getUsername()) {
-        // 今日已验证但用户名未设置（比如清了缓存），自动设置
-        syncManager.setUsername(SYNC_USERNAME);
+      } else if (isTodayAuthed()) {
+        // 今日已验证：设置用户名并从云端拉取最新数据刷新页面
+        if (!syncManager.getUsername()) {
+          syncManager.setUsername(SYNC_USERNAME);
+        }
+        // 用户主动刷新页面时，按云端最新状态显示内容
+        syncManager.pullFromCloud().catch(function() {});
       }
     })();
   </script>
