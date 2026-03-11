@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=37">
+  <link rel="stylesheet" href="style.css?v=38">
 </head>
 <body>
 
@@ -16,6 +16,7 @@
         <h1>植物光照查询器</h1>
         <div class="header-buttons">
           <button class="btn-recommend" id="btnRecommend">推荐植物</button>
+          <button class="btn-sync" id="btnSync">同步</button>
         </div>
       </div>
       <p id="headerDesc">按光照条件将植物归类 / 共收录0种植物</p>
@@ -195,6 +196,63 @@
     </div>
   </div>
 
+  <!-- 同步面板遮罩层 -->
+  <div class="overlay" id="syncOverlay">
+    <div class="card sync-panel" id="syncPanel">
+      <div class="card-header">
+        <div class="card-title">跨设备同步</div>
+        <button class="card-close" id="syncClose">关闭</button>
+      </div>
+
+      <!-- 未配置提示 -->
+      <div class="sync-section" id="syncNotConfigured" style="display:none;">
+        <div class="sync-hint">⚠️ Supabase 未配置，同步功能不可用。请在 supabase-sync.js 中填写 SUPABASE_URL 和 SUPABASE_ANON_KEY。</div>
+      </div>
+
+      <!-- 用户名设置 -->
+      <div class="sync-section" id="syncUsernameSection">
+        <div class="sync-label">用户名</div>
+        <div class="sync-username-row">
+          <input type="text" class="sync-input" id="syncUsernameInput" placeholder="输入用户名以启用同步" maxlength="30">
+          <button class="sync-btn sync-btn-set" id="syncSetUsername">确认</button>
+        </div>
+        <div class="sync-hint" id="syncUsernameHint"></div>
+      </div>
+
+      <!-- 已登录状态 -->
+      <div class="sync-section" id="syncLoggedSection" style="display:none;">
+        <div class="sync-user-info">
+          <span class="sync-label">当前用户</span>
+          <span class="sync-username-display" id="syncUsernameDisplay"></span>
+          <button class="sync-btn-text" id="syncLogout">退出</button>
+        </div>
+      </div>
+
+      <!-- 同步操作 -->
+      <div class="sync-section" id="syncActionsSection" style="display:none;">
+        <div class="sync-actions">
+          <button class="sync-btn sync-btn-primary" id="syncSmartSync">🔄 智能同步</button>
+          <button class="sync-btn" id="syncPush">上传到云端</button>
+          <button class="sync-btn" id="syncPull">从云端拉取</button>
+        </div>
+        <div class="sync-hint">智能同步 = 合并本地与云端数据（推荐）</div>
+      </div>
+
+      <!-- 同步状态 -->
+      <div class="sync-section" id="syncStatusSection" style="display:none;">
+        <div class="sync-status" id="syncStatus"></div>
+        <div class="sync-last-time" id="syncLastTime"></div>
+      </div>
+
+      <!-- 自动同步开关 -->
+      <div class="sync-section" id="syncAutoSection" style="display:none;">
+        <label class="sync-auto-label">
+          <input type="checkbox" id="syncAutoToggle"> 自动同步（每30秒上传）
+        </label>
+      </div>
+    </div>
+  </div>
+
   <!-- 科/属详情遮罩层 -->
   <div class="overlay" id="taxonomyOverlay">
     <div class="card" id="taxonomyCard">
@@ -209,6 +267,7 @@
   </div>
 
   <script src="plant-database.js"></script>
+  <script src="supabase-sync.js"></script>
   <script>
     // 区域配置
     const zones = [
@@ -607,6 +666,7 @@
       document.getElementById('cardFlipContainer').classList.remove('flipped');
       cardFlipped = false;
       document.getElementById('recOverlay').classList.remove('active');
+      document.getElementById('syncOverlay').classList.remove('active');
       document.getElementById('taxonomyOverlay').classList.remove('active');
       document.getElementById('confirmOverlay').classList.remove('active');
       confirmCallback = null;
@@ -1007,6 +1067,194 @@
 
     // 初始化
     render();
+
+    // ========== 同步面板逻辑 ==========
+    (function() {
+      var syncOverlay = document.getElementById('syncOverlay');
+      var syncUsernameInput = document.getElementById('syncUsernameInput');
+      var syncUsernameHint = document.getElementById('syncUsernameHint');
+      var syncUsernameDisplay = document.getElementById('syncUsernameDisplay');
+      var syncStatus = document.getElementById('syncStatus');
+      var syncLastTime = document.getElementById('syncLastTime');
+      var syncAutoToggle = document.getElementById('syncAutoToggle');
+
+      // 重建植物列表（从 localStorage 恢复后刷新界面）
+      function rebuildPlantsFromStorage() {
+        var savedZonePlants = getZonePlants();
+        var boughtNames = getBoughtNames();
+        if (!savedZonePlants) return;
+        
+        var newPlants = [];
+        savedZonePlants.forEach(function(sp) {
+          var dbPlant = findInDatabase(sp.name);
+          if (dbPlant) {
+            var p = {
+              name: dbPlant.name,
+              zone: sp.zone,
+              family: dbPlant.family,
+              origin: dbPlant.origin,
+              difficulty: dbPlant.difficulty,
+              light: dbPlant.light,
+              temperature: dbPlant.temperature,
+              humidity: dbPlant.humidity,
+              watering: dbPlant.watering,
+              fertilizer: dbPlant.fertilizer,
+              soil: dbPlant.soil
+            };
+            if (boughtNames.indexOf(dbPlant.name) !== -1) {
+              p.bought = true;
+            }
+            newPlants.push(p);
+          }
+        });
+        
+        // 替换全局植物列表
+        plants.length = 0;
+        newPlants.forEach(function(p) { plants.push(p); });
+        render();
+      }
+
+      // 配置 syncManager
+      syncManager.configure({
+        onStatus: function(info) {
+          var statusEl = document.getElementById('syncStatus');
+          var statusSection = document.getElementById('syncStatusSection');
+          statusSection.style.display = '';
+          
+          var icon = '';
+          var cls = '';
+          if (info.status === 'syncing') { icon = '⏳'; cls = 'sync-status-syncing'; }
+          else if (info.status === 'success') { icon = '✅'; cls = 'sync-status-success'; }
+          else if (info.status === 'error') { icon = '❌'; cls = 'sync-status-error'; }
+          else if (info.status === 'info') { icon = 'ℹ️'; cls = 'sync-status-info'; }
+          
+          statusEl.className = 'sync-status ' + cls;
+          statusEl.textContent = icon + ' ' + info.message;
+          
+          // 更新上次同步时间
+          var lastTime = syncManager.getLastSyncTime();
+          if (lastTime) {
+            syncLastTime.textContent = '上次同步：' + lastTime.toLocaleTimeString();
+          }
+        },
+        onDataChange: function(zonePlants, boughtNames) {
+          // 云端数据已写入 localStorage，重建植物列表
+          rebuildPlantsFromStorage();
+        }
+      });
+
+      // 更新面板 UI 状态
+      function updateSyncPanelUI() {
+        var configured = syncManager.isConfigured();
+        var username = syncManager.getUsername();
+        
+        document.getElementById('syncNotConfigured').style.display = configured ? 'none' : '';
+        
+        if (!configured) {
+          document.getElementById('syncUsernameSection').style.display = 'none';
+          document.getElementById('syncLoggedSection').style.display = 'none';
+          document.getElementById('syncActionsSection').style.display = 'none';
+          document.getElementById('syncAutoSection').style.display = 'none';
+          return;
+        }
+        
+        if (username) {
+          document.getElementById('syncUsernameSection').style.display = 'none';
+          document.getElementById('syncLoggedSection').style.display = '';
+          document.getElementById('syncActionsSection').style.display = '';
+          document.getElementById('syncAutoSection').style.display = '';
+          syncUsernameDisplay.textContent = username;
+        } else {
+          document.getElementById('syncUsernameSection').style.display = '';
+          document.getElementById('syncLoggedSection').style.display = 'none';
+          document.getElementById('syncActionsSection').style.display = 'none';
+          document.getElementById('syncAutoSection').style.display = 'none';
+        }
+      }
+
+      // 打开同步面板
+      document.getElementById('btnSync').addEventListener('click', function() {
+        hideAllCards();
+        updateSyncPanelUI();
+        syncOverlay.classList.add('active');
+        if (!syncManager.getUsername()) {
+          syncUsernameInput.value = '';
+          syncUsernameInput.focus();
+        }
+      });
+
+      // 关闭同步面板
+      document.getElementById('syncClose').addEventListener('click', function() {
+        syncOverlay.classList.remove('active');
+      });
+      syncOverlay.addEventListener('click', function(e) {
+        if (e.target === this) syncOverlay.classList.remove('active');
+      });
+
+      // 设置用户名
+      document.getElementById('syncSetUsername').addEventListener('click', function() {
+        var name = syncUsernameInput.value.trim();
+        if (!name) {
+          syncUsernameHint.textContent = '请输入用户名';
+          syncUsernameHint.style.color = '#cc0000';
+          return;
+        }
+        if (syncManager.setUsername(name)) {
+          syncUsernameHint.textContent = '';
+          updateSyncPanelUI();
+          // 自动执行一次智能同步
+          syncManager.smartSync().catch(function() {});
+        }
+      });
+
+      // 回车确认用户名
+      syncUsernameInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('syncSetUsername').click();
+        }
+      });
+
+      // 退出登录
+      document.getElementById('syncLogout').addEventListener('click', function() {
+        syncManager.clearUsername();
+        syncAutoToggle.checked = false;
+        document.getElementById('syncStatusSection').style.display = 'none';
+        updateSyncPanelUI();
+      });
+
+      // 智能同步
+      document.getElementById('syncSmartSync').addEventListener('click', function() {
+        syncManager.smartSync().catch(function() {});
+      });
+
+      // 上传
+      document.getElementById('syncPush').addEventListener('click', function() {
+        syncManager.pushToCloud().catch(function() {});
+      });
+
+      // 拉取
+      document.getElementById('syncPull').addEventListener('click', function() {
+        syncManager.pullFromCloud().catch(function() {});
+      });
+
+      // 自动同步开关
+      syncAutoToggle.addEventListener('change', function() {
+        if (this.checked) {
+          syncManager.startAutoSync();
+        } else {
+          syncManager.stopAutoSync();
+        }
+      });
+
+      // 初始化 syncManager
+      syncManager.init();
+
+      // 更新同步按钮上的用户名提示
+      var savedUsername = syncManager.getUsername();
+      if (savedUsername) {
+        document.getElementById('btnSync').title = '已登录：' + savedUsername;
+      }
+    })();
   </script>
 
 </body>
