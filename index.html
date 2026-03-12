@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=64">
+  <link rel="stylesheet" href="style.css?v=73">
 </head>
 <body>
 
@@ -795,8 +795,9 @@
         // 区域头部
         const headerDiv = document.createElement('div');
         headerDiv.className = 'zone-header';
+        var conditionHTML = zone.condition.replace(/(\uff08[^\uff09]*\uff09)/g, '<span class="zone-condition-sub">$1</span>');
         headerDiv.innerHTML = '<span class="zone-number">' + zone.label + '</span>' +
-          '<span class="zone-condition">' + zone.condition + '</span>';
+          '<span class="zone-condition">' + conditionHTML + '</span>';
         zoneDiv.appendChild(headerDiv);
 
         // 植物列表
