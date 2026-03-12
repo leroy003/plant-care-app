@@ -504,4 +504,17 @@ var plantPhotos={
 '柿子':[bk+'e4dde71190ef76c6a7ef3e8a1f40eafaaf51f3dec941',bk+'e850352ac65c103853433e1b31478413b07ecb8023e9',bk+'4e4a20a4462309f7905238cbf1581bf3d7ca7acb78e9'],
 };
 var defaultPhotos=[bk+'3b87e950352ac65c103824a52baaa5119313b17e1c96',bk+'0823dd54564e9258d10908384cdac658ccbf6d81e096',bk+'b58f8c5494eef01f3a29c75c72a68e25bc315d60d7ab'];
-function getPlantPhotos(name){return plantPhotos[name]||defaultPhotos;}
+var badPrefix=bk+'00e93901213fb80e';
+function getPlantPhotos(name){
+  var photos=plantPhotos[name]||defaultPhotos;
+  var filtered=[];
+  for(var i=0;i<photos.length;i++){if(photos[i].indexOf(badPrefix)!==0)filtered.push(photos[i]);}
+  if(filtered.length===0)return defaultPhotos;
+  // 不足3张时用默认照片补齐
+  var di=0;
+  while(filtered.length<3&&di<defaultPhotos.length){
+    if(filtered.indexOf(defaultPhotos[di])===-1)filtered.push(defaultPhotos[di]);
+    di++;
+  }
+  return filtered;
+}

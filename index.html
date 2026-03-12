@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=73">
+  <link rel="stylesheet" href="style.css?v=77">
 </head>
 <body>
 
@@ -131,72 +131,95 @@
 
   <!-- 推荐植物卡片遮罩层 -->
   <div class="overlay" id="recOverlay">
-    <div class="card" id="recCard">
-      <div class="card-header">
-        <div class="card-title" id="recTitle"></div>
-        <div class="card-header-btns">
-          <button class="card-close" id="recRefresh">刷新</button>
-          <button class="card-close" id="recClose">关闭</button>
+    <div class="card-flip-container" id="recFlipContainer">
+      <div class="card-flip-inner">
+      <!-- 正面：推荐详情 -->
+      <div class="card card-front" id="recCard">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div class="card-title" id="recTitle"></div>
+            <img class="card-photo-btn" id="recPhotoBtn" src="leaf-icon.webp" alt="查看照片" title="查看照片">
+          </div>
+          <div class="card-header-btns">
+            <button class="card-close" id="recRefresh">刷新</button>
+            <button class="card-close" id="recClose">关闭</button>
+          </div>
+        </div>
+
+        <!-- 基本信息 -->
+        <div class="card-group">
+          <div class="card-group-title">基本信息</div>
+          <div class="card-row">
+            <span class="card-label">科属种</span>
+            <span class="card-value" id="recFamily"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">原产地</span>
+            <span class="card-value" id="recOrigin"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">难易度</span>
+            <span class="card-value card-stars" id="recDifficulty"></span>
+          </div>
+        </div>
+
+        <!-- 环境习性 -->
+        <div class="card-group">
+          <div class="card-group-title">环境习性</div>
+          <div class="card-row">
+            <span class="card-label">光照</span>
+            <span class="card-value" id="recLight"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">温度</span>
+            <span class="card-value" id="recTemperature"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">湿度</span>
+            <span class="card-value" id="recHumidity"></span>
+          </div>
+        </div>
+
+        <!-- 养护操作 -->
+        <div class="card-group">
+          <div class="card-group-title">养护操作</div>
+          <div class="card-row">
+            <span class="card-label">浇水</span>
+            <span class="card-value" id="recWatering"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">施肥</span>
+            <span class="card-value" id="recFertilizer"></span>
+          </div>
+          <div class="card-row">
+            <span class="card-label">土壤</span>
+            <span class="card-value" id="recSoil"></span>
+          </div>
+        </div>
+
+        <div class="rec-footer">
+          <div class="rec-zone-select">
+            <span class="rec-zone-label">区域</span>
+            <div class="rec-zone-radios" id="recZoneRadios"></div>
+          </div>
+          <button class="btn-add" id="recAdd">添加</button>
         </div>
       </div>
 
-      <!-- 基本信息 -->
-      <div class="card-group">
-        <div class="card-group-title">基本信息</div>
-        <div class="card-row">
-          <span class="card-label">科属种</span>
-          <span class="card-value" id="recFamily"></span>
+      <!-- 背面：植物照片 -->
+      <div class="card card-back" id="recCardBack">
+        <div class="card-header">
+          <div class="card-title-row">
+            <div class="card-title" id="recBackTitle"></div>
+            <img class="card-photo-btn" id="recBackBtn" src="leaf-icon.webp" alt="返回详情" title="返回详情">
+          </div>
+          <div class="card-header-btns">
+            <button class="card-close" id="recBackRefresh">刷新</button>
+            <button class="card-close" id="recBackClose">关闭</button>
+          </div>
         </div>
-        <div class="card-row">
-          <span class="card-label">原产地</span>
-          <span class="card-value" id="recOrigin"></span>
-        </div>
-        <div class="card-row">
-          <span class="card-label">难易度</span>
-          <span class="card-value card-stars" id="recDifficulty"></span>
-        </div>
+        <div class="card-photos" id="recPhotos"></div>
       </div>
-
-      <!-- 环境习性 -->
-      <div class="card-group">
-        <div class="card-group-title">环境习性</div>
-        <div class="card-row">
-          <span class="card-label">光照</span>
-          <span class="card-value" id="recLight"></span>
-        </div>
-        <div class="card-row">
-          <span class="card-label">温度</span>
-          <span class="card-value" id="recTemperature"></span>
-        </div>
-        <div class="card-row">
-          <span class="card-label">湿度</span>
-          <span class="card-value" id="recHumidity"></span>
-        </div>
-      </div>
-
-      <!-- 养护操作 -->
-      <div class="card-group">
-        <div class="card-group-title">养护操作</div>
-        <div class="card-row">
-          <span class="card-label">浇水</span>
-          <span class="card-value" id="recWatering"></span>
-        </div>
-        <div class="card-row">
-          <span class="card-label">施肥</span>
-          <span class="card-value" id="recFertilizer"></span>
-        </div>
-        <div class="card-row">
-          <span class="card-label">土壤</span>
-          <span class="card-value" id="recSoil"></span>
-        </div>
-      </div>
-
-      <div class="rec-footer">
-        <div class="rec-zone-select">
-          <span class="rec-zone-label">区域</span>
-          <div class="rec-zone-radios" id="recZoneRadios"></div>
-        </div>
-        <button class="btn-add" id="recAdd">添加</button>
       </div>
     </div>
   </div>
@@ -350,6 +373,7 @@
     var plants = initPlants();
     // 卡片翻转状态
     var cardFlipped = false;
+    var recCardFlipped = false;
 
     // 翻转到照片面
     function flipToPhotos() {
@@ -435,6 +459,8 @@
       document.getElementById('cardFlipContainer').classList.remove('flipped');
       cardFlipped = false;
       document.getElementById('recOverlay').classList.remove('active');
+      document.getElementById('recFlipContainer').classList.remove('flipped');
+      recCardFlipped = false;
       document.getElementById('searchOverlay').classList.remove('active');
       document.getElementById('dailyAuthOverlay').classList.remove('active');
       document.getElementById('taxonomyOverlay').classList.remove('active');
@@ -847,6 +873,10 @@
       hideAllCards();
 
       currentRecPlant = plant;
+      // 重置为正面
+      document.getElementById('recFlipContainer').classList.remove('flipped');
+      recCardFlipped = false;
+
       document.getElementById('recTitle').textContent = plant.name;
       document.getElementById('recFamily').innerHTML = renderFamilyLinks(plant.family);
       document.getElementById('recOrigin').textContent = plant.origin;
@@ -871,7 +901,54 @@
 
     function hideRecCard() {
       document.getElementById('recOverlay').classList.remove('active');
+      document.getElementById('recFlipContainer').classList.remove('flipped');
+      recCardFlipped = false;
     }
+
+    // 推荐卡片翻转到照片面
+    function recFlipToPhotos() {
+      if (!currentRecPlant) return;
+      var photos = getPlantPhotos(currentRecPlant.name);
+      document.getElementById('recBackTitle').textContent = currentRecPlant.name;
+      var photosHTML = photos.map(function(url) {
+        return '<div class="card-photo-item"><img src="' + url + '" alt="' + currentRecPlant.name + '" loading="lazy"></div>';
+      }).join('');
+      document.getElementById('recPhotos').innerHTML = photosHTML;
+      document.getElementById('recFlipContainer').classList.add('flipped');
+      recCardFlipped = true;
+    }
+
+    // 推荐卡片翻转回详情面
+    function recFlipToDetails() {
+      document.getElementById('recFlipContainer').classList.remove('flipped');
+      recCardFlipped = false;
+    }
+
+    // 推荐卡片翻转按钮事件
+    document.getElementById('recPhotoBtn').addEventListener('click', recFlipToPhotos);
+    document.getElementById('recBackBtn').addEventListener('click', recFlipToDetails);
+    document.getElementById('recBackClose').addEventListener('click', hideRecCard);
+    document.getElementById('recBackRefresh').addEventListener('click', function() {
+      var newPlant = getRandomRecommend();
+      currentRecPlant = newPlant;
+      document.getElementById('recTitle').textContent = newPlant.name;
+      document.getElementById('recFamily').innerHTML = renderFamilyLinks(newPlant.family);
+      document.getElementById('recOrigin').textContent = newPlant.origin;
+      document.getElementById('recDifficulty').innerHTML = renderStars(newPlant.difficulty);
+      document.getElementById('recLight').textContent = newPlant.light;
+      document.getElementById('recTemperature').textContent = newPlant.temperature;
+      document.getElementById('recHumidity').textContent = newPlant.humidity;
+      document.getElementById('recWatering').textContent = newPlant.watering;
+      document.getElementById('recFertilizer').textContent = newPlant.fertilizer;
+      document.getElementById('recSoil').textContent = newPlant.soil;
+      var radiosHTML = '';
+      zones.forEach(function(zone) {
+        radiosHTML += '<label><input type="radio" name="recZone" value="' + zone.id + '"' +
+          (zone.id === newPlant.defaultZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
+      });
+      document.getElementById('recZoneRadios').innerHTML = radiosHTML;
+      recFlipToPhotos();
+    });
 
     // 推荐植物按钮
     document.getElementById('btnRecommend').addEventListener('click', function() {
