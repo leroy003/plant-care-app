@@ -85,6 +85,88 @@ body {
   border-color: #999999;
 }
 
+/* Search card */
+#searchCard {
+  width: 360px;
+  max-width: 90vw;
+  height: 500px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-input-wrap {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+.search-input {
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  font-family: var(--font-family);
+  color: #333333;
+  background: #F5F5F5;
+  box-sizing: border-box;
+}
+
+.search-input::placeholder {
+  color: #cccccc;
+}
+
+.search-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 12px 0;
+  flex-shrink: 0;
+}
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: flex-start;
+}
+
+.search-result-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  font-size: 13px;
+  color: var(--color-dark);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  line-height: 1.6;
+  user-select: none;
+  cursor: pointer;
+}
+
+.search-result-tag:hover {
+  border-color: #999999;
+}
+
+.search-result-tag .search-highlight {
+  color: #00BC3E;
+}
+
+.search-result-tag.search-collected {
+  color: #00BC3E;
+}
+
+.search-empty {
+  width: 100%;
+  font-size: 14px;
+  color: var(--color-gray);
+  text-align: center;
+  padding: 20px 0;
+}
+
 /* Zone */
 .zone {
   padding: 24px 0;
@@ -119,37 +201,27 @@ body {
 .plant-list {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  row-gap: 12px;
+  gap: 8px;
 }
 
-.plant-item {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-}
-
-.plant-icon {
-  color: #999999;
-  margin-right: 2px;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.plant-name {
-  font-size: 14px;
+.plant-tag {
+  display: inline-block;
+  padding: 4px 14px;
+  font-size: 13px;
   color: var(--color-dark);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  line-height: 1.6;
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: #999999;
-  text-underline-offset: 3px;
+  user-select: none;
 }
 
-.plant-separator {
-  margin: 0 8px;
-  color: #999999;
-  font-size: 12px;
-  user-select: none;
+.plant-tag:hover {
+  border-color: #999999;
+}
+
+.plant-tag.plant-tag-bought {
+  color: #00BC3E;
 }
 
 .plant-empty {
@@ -388,10 +460,7 @@ body {
   border-color: #cc0000;
 }
 
-.plant-name.plant-bought {
-  color: #00BC3E;
-  text-decoration-color: #00BC3E;
-}
+
 
 .card-bought {
   display: block;

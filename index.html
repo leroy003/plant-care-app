@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=59">
+  <link rel="stylesheet" href="style.css?v=64">
 </head>
 <body>
 
@@ -15,7 +15,8 @@
       <div class="header-top">
         <h1>植物光照查询器</h1>
         <div class="header-buttons">
-          <button class="btn-recommend" id="btnRecommend">推荐植物</button>
+          <button class="btn-recommend" id="btnSearch">搜索</button>
+          <button class="btn-recommend" id="btnRecommend">推荐</button>
           <button class="btn-sync" id="btnSync">同步</button>
         </div>
       </div>
@@ -110,6 +111,21 @@
         <div class="card-photos" id="cardPhotos"></div>
       </div>
       </div>
+    </div>
+  </div>
+
+  <!-- 搜索植物卡片遮罩层 -->
+  <div class="overlay" id="searchOverlay">
+    <div class="card" id="searchCard">
+      <div class="card-header">
+        <div class="card-title">搜索植物</div>
+        <button class="card-close" id="searchClose">关闭</button>
+      </div>
+      <div class="search-input-wrap">
+        <input type="text" class="search-input" id="searchInput" placeholder="输入植物名称">
+      </div>
+      <div class="search-divider"></div>
+      <div class="search-results" id="searchResults"></div>
     </div>
   </div>
 
@@ -624,6 +640,7 @@
       document.getElementById('cardFlipContainer').classList.remove('flipped');
       cardFlipped = false;
       document.getElementById('recOverlay').classList.remove('active');
+      document.getElementById('searchOverlay').classList.remove('active');
       document.getElementById('dailyAuthOverlay').classList.remove('active');
       document.getElementById('taxonomyOverlay').classList.remove('active');
       document.getElementById('confirmOverlay').classList.remove('active');
@@ -789,31 +806,14 @@
         if (zonePlants.length === 0) {
           listDiv.innerHTML = '<span class="plant-empty">暂无植物</span>';
         } else {
-          zonePlants.forEach(function(plant, index) {
-            const item = document.createElement('span');
-            item.className = 'plant-item';
-
-            const icon = document.createElement('span');
-            icon.className = 'plant-icon';
-            icon.textContent = '◎';
-
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'plant-name' + (plant.bought ? ' plant-bought' : '');
-            nameSpan.textContent = plant.name;
-            nameSpan.addEventListener('click', function() {
+          zonePlants.forEach(function(plant) {
+            const tag = document.createElement('span');
+            tag.className = 'plant-tag' + (plant.bought ? ' plant-tag-bought' : '');
+            tag.textContent = plant.name;
+            tag.addEventListener('click', function() {
               showCard(plant);
             });
-
-            item.appendChild(icon);
-            item.appendChild(nameSpan);
-            listDiv.appendChild(item);
-
-            if (index < zonePlants.length - 1) {
-              const sep = document.createElement('span');
-              sep.className = 'plant-separator';
-              sep.textContent = '·';
-              listDiv.appendChild(sep);
-            }
+            listDiv.appendChild(tag);
           });
         }
 
@@ -906,6 +906,126 @@
       if (e.target === this) {
         hideCard();
       }
+    });
+
+    // ========== 搜索植物功能 ==========
+    var searchStateKeyword = ''; // 记忆上次的关键词
+
+    function showSearchCard() {
+      document.getElementById('searchOverlay').classList.add('active');
+      // 恢复上次的关键词和结果
+      document.getElementById('searchInput').value = searchStateKeyword;
+      renderSearchResults(searchStateKeyword);
+      setTimeout(function() {
+        document.getElementById('searchInput').focus();
+      }, 100);
+    }
+
+    function hideSearchCard() {
+      // 保存当前关键词
+      searchStateKeyword = document.getElementById('searchInput').value;
+      document.getElementById('searchOverlay').classList.remove('active');
+    }
+
+    function renderSearchResults(keyword) {
+      var resultsDiv = document.getElementById('searchResults');
+      var kw = keyword.trim();
+
+      // 无关键词：显示全部500种，按数据库原始顺序
+      if (!kw) {
+        var html = '';
+        plantDatabase.forEach(function(p) {
+          var inZone = plants.some(function(zp) { return zp.name === p.name; });
+          var cls = 'search-result-tag' + (inZone ? ' search-collected' : '');
+          html += '<span class="' + cls + '" data-name="' + p.name + '">' + p.name + '</span>';
+        });
+        resultsDiv.innerHTML = html;
+        return;
+      }
+
+      // 逐字拆分关键词，去重
+      var chars = [];
+      for (var i = 0; i < kw.length; i++) {
+        var c = kw[i].toLowerCase();
+        if (chars.indexOf(c) === -1) chars.push(c);
+      }
+
+      // 匹配：植物名中包含任意1个关键字即命中
+      var matched = [];
+      plantDatabase.forEach(function(p, idx) {
+        var matchCount = 0;
+        var matchedChars = [];
+        for (var j = 0; j < chars.length; j++) {
+          if (p.name.toLowerCase().indexOf(chars[j]) !== -1) {
+            matchCount++;
+            matchedChars.push(chars[j]);
+          }
+        }
+        if (matchCount > 0) {
+          var inZone = plants.some(function(zp) { return zp.name === p.name; });
+          matched.push({ plant: p, matchCount: matchCount, matchedChars: matchedChars, inZone: inZone, dbIndex: idx });
+        }
+      });
+
+      // 排序：匹配字数降序 → 已收藏优先 → 数据库原始顺序
+      matched.sort(function(a, b) {
+        if (b.matchCount !== a.matchCount) return b.matchCount - a.matchCount;
+        if (a.inZone !== b.inZone) return a.inZone ? -1 : 1;
+        return a.dbIndex - b.dbIndex;
+      });
+
+      if (matched.length === 0) {
+        resultsDiv.innerHTML = '<div class="search-empty">未找到相关植物</div>';
+        return;
+      }
+
+      // 渲染标签，高亮匹配字
+      var html = '';
+      matched.forEach(function(item) {
+        var name = item.plant.name;
+        var highlightedName = '';
+        for (var k = 0; k < name.length; k++) {
+          var ch = name[k];
+          if (item.matchedChars.indexOf(ch.toLowerCase()) !== -1) {
+            highlightedName += '<span class="search-highlight">' + ch + '</span>';
+          } else {
+            highlightedName += ch;
+          }
+        }
+        html += '<span class="search-result-tag" data-name="' + name + '">' + highlightedName + '</span>';
+      });
+      resultsDiv.innerHTML = html;
+    }
+
+    // 初始化：默认显示全部植物
+    renderSearchResults('');
+
+    // 搜索按钮
+    document.getElementById('btnSearch').addEventListener('click', showSearchCard);
+
+    // 实时搜索
+    document.getElementById('searchInput').addEventListener('input', function() {
+      renderSearchResults(this.value);
+    });
+
+    // 点击搜索结果，打开该植物的推荐卡片
+    document.getElementById('searchResults').addEventListener('click', function(e) {
+      var tag = e.target.closest('.search-result-tag');
+      if (!tag) return;
+      var name = tag.getAttribute('data-name');
+      var plant = plantDatabase.find(function(p) { return p.name === name; });
+      if (plant) {
+        // 保存当前状态后关闭
+        searchStateKeyword = document.getElementById('searchInput').value;
+        document.getElementById('searchOverlay').classList.remove('active');
+        showRecCard(plant);
+      }
+    });
+
+    // 关闭搜索卡片
+    document.getElementById('searchClose').addEventListener('click', hideSearchCard);
+    document.getElementById('searchOverlay').addEventListener('click', function(e) {
+      if (e.target === this) hideSearchCard();
     });
 
     // ========== 推荐植物功能 ==========
