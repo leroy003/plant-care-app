@@ -136,7 +136,7 @@ var syncManager = (function () {
       return Promise.resolve(null);
     }
     _syncing = true;
-    emitStatus('syncing', '正在拉取...');
+    emitStatus('syncing', '正在读取植物数据...');
 
     var path = 'user_plant_data?username=eq.' + encodeURIComponent(_username) + '&select=*';
     return supabaseRequest('GET', path)
@@ -153,7 +153,7 @@ var syncManager = (function () {
         localStorage.setItem(STORAGE_KEY_BOUGHT, JSON.stringify(remote.bought_names || []));
 
         _lastSyncTime = new Date();
-        emitStatus('success', '拉取成功');
+        emitStatus('success', '读取植物数据成功');
 
         // 通知外部刷新界面
         if (_dataChangeCallback) {

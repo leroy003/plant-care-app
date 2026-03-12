@@ -67,12 +67,14 @@ body {
 }
 
 .btn-recommend {
-  font-size: 13px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 28px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
-  padding: 4px 14px;
+  border-radius: 16px;
+  padding: 0 14px;
   cursor: pointer;
   font-family: var(--font-family);
   flex-shrink: 0;
@@ -196,6 +198,7 @@ body {
 .card {
   background: var(--color-white);
   border: 1px solid var(--color-border);
+  border-radius: 16px;
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
@@ -264,7 +267,7 @@ body {
 
 .card-photo-item {
   width: 100%;
-  border-radius: 4px;
+  border-radius: 6px;
   overflow: hidden;
   background: #f5f5f5;
 }
@@ -291,12 +294,14 @@ body {
 }
 
 .card-close {
-  font-size: 13px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 28px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
-  padding: 4px 14px;
+  border-radius: 16px;
+  padding: 0 14px;
   cursor: pointer;
   font-family: var(--font-family);
   flex-shrink: 0;
@@ -365,13 +370,15 @@ body {
 
 .card-btn-delete {
   display: block;
-  padding: 4px 0;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
   flex: 1;
-  font-size: 13px;
+  font-size: 14px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: var(--font-family);
 }
@@ -388,13 +395,15 @@ body {
 
 .card-bought {
   display: block;
-  padding: 4px 0;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
   flex: 1;
-  font-size: 13px;
+  font-size: 14px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: var(--font-family);
 }
@@ -456,13 +465,15 @@ body {
 
 .btn-add {
   display: block;
-  padding: 4px 0;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
   width: 100%;
-  font-size: 13px;
+  font-size: 14px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: var(--font-family);
 }
@@ -519,7 +530,7 @@ body {
   font-size: 13px;
   color: var(--color-dark);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 6px;
   line-height: 1.6;
   user-select: none;
 }
@@ -562,9 +573,11 @@ body {
 .confirm-btn-cancel,
 .confirm-btn-ok {
   flex: 1;
-  padding: 8px 0;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
   font-size: 14px;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: var(--font-family);
   border: 1px solid var(--color-border);
@@ -592,12 +605,14 @@ body {
 
 /* ========== Sync Button ========== */
 .btn-sync {
-  font-size: 13px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 28px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
-  padding: 4px 14px;
+  border-radius: 16px;
+  padding: 0 14px;
   cursor: pointer;
   font-family: var(--font-family);
   flex-shrink: 0;
@@ -624,6 +639,7 @@ body {
   font-weight: 600;
   color: var(--color-dark);
   margin-bottom: 20px;
+  text-align: center;
 }
 
 /* 输入框容器 */
@@ -637,15 +653,16 @@ body {
 
 .daily-auth-input {
   width: 100%;
-  padding: 4px 14px;
-  font-size: 13px;
-  line-height: normal;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 14px;
+  font-size: 14px;
   border: none;
   outline: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-family: var(--font-family);
   color: #333333;
-  background: #E5E5E5;
+  background: #F5F5F5;
   box-sizing: border-box;
   text-align: center;
   caret-color: transparent;
@@ -677,12 +694,14 @@ body {
 
 .daily-auth-btn {
   width: 100%;
-  padding: 4px 14px;
-  font-size: 13px;
+  height: 40px;
+  line-height: 38px;
+  padding: 0;
+  font-size: 14px;
   color: #666666;
   background: none;
   border: 1px solid var(--color-border);
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
   font-family: var(--font-family);
 }
@@ -711,7 +730,7 @@ body {
   transform: translateX(-50%) translateY(-80px);
   background: #ffffff;
   border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 10px 20px;
   font-size: 13px;
   color: var(--color-dark);
@@ -730,11 +749,11 @@ body {
 }
 
 .sync-toast-syncing {
-  border-color: #e6a800;
+  border-color: var(--color-border);
 }
 
 .sync-toast-success {
-  border-color: #00BC3E;
+  border-color: var(--color-border);
 }
 
 .sync-toast-error {

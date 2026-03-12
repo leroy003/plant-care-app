@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=47">
+  <link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
 
@@ -199,7 +199,7 @@
   <!-- 每日身份验证弹窗 -->
   <div class="overlay" id="dailyAuthOverlay">
     <div class="daily-auth-dialog">
-      <div class="daily-auth-title">你朋友的名字叫*杨</div>
+      <div class="daily-auth-title">Nature does not hurry,<br>yet everything is accomplished.</div>
       <div class="daily-auth-input-wrap" id="dailyAuthInputWrap">
         <input type="text" class="daily-auth-input" id="dailyAuthInput" placeholder="" maxlength="30" autocomplete="off">
         <span class="daily-auth-caret" id="dailyAuthCaret"></span>
@@ -225,7 +225,7 @@
   </div>
 
   <script src="plant-database.js"></script>
-  <script src="supabase-sync.js"></script>
+  <script src="supabase-sync.js?v=2"></script>
   <script>
     // 区域配置
     const zones = [
@@ -1028,7 +1028,7 @@
 
     // ========== 同步逻辑（简化版） ==========
     (function() {
-      var SYNC_USERNAME = 'Leroy';
+      var SYNC_USERNAME = '老子';
       var DAILY_AUTH_KEY = 'sync_daily_auth';
       var toastTimer = null;
 
@@ -1071,9 +1071,7 @@
       function showToast(message, type) {
         var toast = document.getElementById('syncToast');
         var icon = '';
-        if (type === 'syncing') icon = '⏳ ';
-        else if (type === 'success') icon = '✅ ';
-        else if (type === 'error') icon = '❌ ';
+        if (type === 'error') icon = '❌ ';
         else if (type === 'info') icon = 'ℹ️ ';
         
         toast.textContent = icon + message;
@@ -1214,7 +1212,9 @@
       syncManager.init();
 
       // 页面加载时：如果今日未验证，弹出验证框
-      if (syncManager.isConfigured() && !isTodayAuthed()) {
+      if (location.search.indexOf('preview=auth') !== -1) {
+        setTimeout(showDailyAuth, 300);
+      } else if (syncManager.isConfigured() && !isTodayAuthed()) {
         // 延迟一点显示，等页面渲染完
         setTimeout(showDailyAuth, 500);
       } else if (isTodayAuthed()) {
