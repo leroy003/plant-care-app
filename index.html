@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=55">
+  <link rel="stylesheet" href="style.css?v=59">
 </head>
 <body>
 
@@ -822,7 +822,7 @@
       });
 
       // 更新标题描述中的植物数量
-      document.getElementById('headerDesc').textContent = '按光照条件将植物归类 / 区域内' + plants.length + '种 · 植物库共' + plantDatabase.length + '种';
+      document.getElementById('headerDesc').textContent = '按光照条件归类植物｜已收藏' + plants.length + '/' + plantDatabase.length + '种植物';
     }
 
     // 当前查看的植物
@@ -1072,7 +1072,6 @@
         var toast = document.getElementById('syncToast');
         var icon = '';
         if (type === 'error') icon = '❌ ';
-        else if (type === 'info') icon = 'ℹ️ ';
         
         toast.textContent = icon + message;
         toast.className = 'sync-toast sync-toast-show sync-toast-' + type;
