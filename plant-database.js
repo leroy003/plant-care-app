@@ -1,4 +1,4 @@
-// 统一植物数据库（共 500 种，支持未来扩展）
+// 统一植物数据库（共 521 种，支持未来扩展）
 // isDefault: true 的植物会默认显示在首页区域中
 // defaultZone: 推荐的默认光照区域
 var plantDatabase = [
@@ -147,6 +147,7 @@ var plantDatabase = [
 {name:'黄杨',family:'黄杨科 / 黄杨属 / 黄杨',origin:'中国',difficulty:4,defaultZone:3,isDefault:false,light:'喜散射光，耐半阴',temperature:'5-28°C，耐寒',humidity:'适中',watering:'保持微润',fertilizer:'生长期每月1次液肥',soil:'疏松肥沃排水良好的壤土'},
 {name:'九里香',family:'芸香科 / 九里香属 / 九里香',origin:'中国南方',difficulty:4,defaultZone:4,isDefault:false,light:'喜充足阳光',temperature:'15-30°C',humidity:'适中',watering:'土干浇透',fertilizer:'生长期每月1次液肥',soil:'疏松透气排水良好的壤土'},
 {name:'罗汉松',family:'罗汉松科 / 罗汉松属 / 罗汉松',origin:'中国南方',difficulty:3,defaultZone:3,isDefault:false,light:'喜散射光至充足阳光',temperature:'5-30°C',humidity:'喜湿润',watering:'保持微润',fertilizer:'生长期每月1次液肥',soil:'疏松透气排水良好的壤土'},
+{name:'千屈菜',family:'千屈菜科 / 千屈菜属 / 千屈菜',origin:'中国、欧洲、亚洲温带',difficulty:5,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最盛，耐半阴',temperature:'-20~35°C，耐寒性极强',humidity:'喜湿润环境，耐水湿',watering:'喜湿润，可浅水栽培，忌长期干旱',fertilizer:'生长期每月1次复合肥，花期增施磷钾肥',soil:'不挑土壤，耐贫瘠，湿润肥沃土壤生长更旺'},
 {name:'紫薇',family:'千屈菜科 / 紫薇属 / 紫薇',origin:'中国',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光',temperature:'5-35°C，耐寒',humidity:'适中',watering:'土干浇透',fertilizer:'花期每月1次磷钾肥',soil:'排水良好的壤土'},
 {name:'石榴',family:'千屈菜科 / 石榴属 / 石榴',origin:'中亚',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光',temperature:'5-35°C，耐寒',humidity:'适中',watering:'土干浇透',fertilizer:'花果期每月1次磷钾肥',soil:'排水良好的壤土'},
 {name:'无花果',family:'桑科 / 榕属 / 无花果',origin:'地中海',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光',temperature:'10-35°C',humidity:'适中',watering:'保持微润',fertilizer:'果期每2周1次复合肥',soil:'疏松肥沃排水良好的壤土'},
@@ -504,5 +505,25 @@ var plantDatabase = [
 {name:'合欢',family:'豆科 / 合欢属 / 合欢',origin:'中国、日本',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最佳',temperature:'-10~30°C，耐寒性好',humidity:'适应性强',watering:'耐旱，土干浇透',fertilizer:'春季施1次有机肥',soil:'疏松肥沃排水良好的壤土'},
 {name:'木芙蓉',family:'锦葵科 / 木槿属 / 木芙蓉',origin:'中国',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最佳',temperature:'-5~30°C，耐轻霜',humidity:'适应性强',watering:'保持微润，忌积水',fertilizer:'花期每月施1次磷钾肥',soil:'疏松肥沃排水良好的壤土'},
 {name:'猕猴桃',family:'猕猴桃科 / 猕猴桃属 / 猕猴桃',origin:'中国',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照结果最多',temperature:'-10~28°C，耐寒性好',humidity:'喜湿润环境',watering:'保持湿润，结果期需水多',fertilizer:'结果期每月施1次复合肥',soil:'疏松肥沃排水良好的壤土'},
-{name:'柿子',family:'柿科 / 柿属 / 柿子',origin:'中国、日本',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照结果最佳',temperature:'-15~30°C，耐寒性好',humidity:'适应性强',watering:'保持微润，忌积水',fertilizer:'春秋各施1次有机肥',soil:'疏松肥沃排水良好的壤土'}
+{name:'柿子',family:'柿科 / 柿属 / 柿子',origin:'中国、日本',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照结果最佳',temperature:'-15~30°C，耐寒性好',humidity:'适应性强',watering:'保持微润，忌积水',fertilizer:'春秋各施1次有机肥',soil:'疏松肥沃排水良好的壤土'},
+{name:'梅花',family:'蔷薇科 / 杏属 / 梅花',origin:'中国西南部',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最盛',temperature:'-15~28°C，耐寒性强，需低温春化',humidity:'适应性强，忌高湿闷热',watering:'保持微润，花期适当控水，忌积水',fertilizer:'花后施1次有机肥，秋季增施磷钾肥促花芽',soil:'疏松肥沃、排水良好的微酸性至中性壤土'},
+{name:'玉兰',family:'木兰科 / 玉兰属 / 玉兰',origin:'中国中部',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最佳',temperature:'-15~28°C，耐寒性较强',humidity:'喜湿润环境，忌干燥',watering:'保持湿润，夏季需水量大，忌积水',fertilizer:'花后及秋季各施1次有机肥',soil:'疏松肥沃、排水良好的微酸性土壤'},
+{name:'银杏',family:'银杏科 / 银杏属 / 银杏',origin:'中国',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照生长最佳',temperature:'-20~35°C，耐寒耐热性均强',humidity:'适应性极强',watering:'耐旱，土干浇透，忌长期积水',fertilizer:'春季施1次有机肥即可',soil:'不挑土壤，排水良好即可，耐贫瘠'},
+{name:'桃花',family:'蔷薇科 / 桃属 / 桃花',origin:'中国西北部',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最盛',temperature:'-15~30°C，耐寒性好',humidity:'适应性强，忌高湿闷热',watering:'保持微润，忌积水，花期控水',fertilizer:'花后施1次复合肥，秋季施1次有机肥',soil:'疏松肥沃、排水良好的中性至微碱性壤土'},
+{name:'桔梗',family:'桔梗科 / 桔梗属 / 桔梗',origin:'中国、日本、朝鲜',difficulty:3,defaultZone:4,isDefault:false,light:'喜充足阳光，也耐半阴',temperature:'-20~30°C，耐寒性极强',humidity:'喜适中湿度',watering:'保持微润，忌积水，耐短期干旱',fertilizer:'生长期每月1次复合肥，花期增施磷钾肥',soil:'疏松肥沃、排水良好的沙质壤土，忌黏重'},
+{name:'勿忘我',family:'紫草科 / 勿忘草属 / 勿忘我',origin:'欧洲',difficulty:4,defaultZone:4,isDefault:false,light:'喜充足阳光，也耐半阴',temperature:'10-25°C，喜凉爽，不耐高温',humidity:'喜适中湿度，忌高湿闷热',watering:'保持微润，忌积水和过于干旱',fertilizer:'生长期每月1次稀薄液肥',soil:'疏松肥沃、排水良好的微碱性沙质壤土'},
+{name:'夜来香',family:'萝藦科 / 夜来香属 / 夜来香',origin:'中国南方、印度',difficulty:4,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照生长开花最佳',temperature:'8-35°C，不耐寒，低于5°C需入室',humidity:'喜湿润环境',watering:'生长期保持湿润，冬季减少浇水',fertilizer:'生长期每2周施1次液肥，花期增施磷钾肥',soil:'疏松肥沃、排水良好的微酸性土壤'},
+{name:'葡萄',family:'葡萄科 / 葡萄属 / 葡萄',origin:'西亚、地中海沿岸',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，每天至少6小时直射光',temperature:'-15~35°C，耐寒耐热性均好',humidity:'适应性强，忌高湿闷热',watering:'果期保持湿润，成熟期控水提高甜度',fertilizer:'萌芽期施氮肥，果期增施磷钾肥',soil:'疏松肥沃、排水良好的沙质壤土，微酸至中性'},
+{name:'木瓜',family:'番木瓜科 / 番木瓜属 / 木瓜',origin:'中美洲、墨西哥',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照结果最佳',temperature:'20-35°C，不耐寒，低于5°C易冻伤',humidity:'喜湿润环境',watering:'保持湿润，生长期需水量大，忌积水',fertilizer:'生长期每月施1次复合肥，果期增施磷钾肥',soil:'疏松肥沃、排水良好的微酸性壤土'},
+{name:'樱桃',family:'蔷薇科 / 李属 / 樱桃',origin:'欧洲、西亚',difficulty:2,defaultZone:5,isDefault:false,light:'喜充足阳光，每天至少6小时直射光',temperature:'-20~30°C，需低温春化，耐寒性好',humidity:'喜适中湿度，忌高湿',watering:'花期和果期保持湿润，忌积水',fertilizer:'花后施1次复合肥，果期增施磷钾肥',soil:'疏松肥沃、排水良好的中性至微酸性壤土'},
+{name:'乒乓菊',family:'菊科 / 菊属 / 乒乓菊',origin:'中国、日本（园艺品种）',difficulty:3,defaultZone:4,isDefault:false,light:'喜充足阳光，也耐半阴，短日照促花',temperature:'10-25°C，喜凉爽，不耐高温高湿',humidity:'喜适中湿度',watering:'保持微润，忌积水，忌叶面喷水',fertilizer:'生长期每2周施1次液肥，现蕾后增施磷钾肥',soil:'疏松肥沃、排水良好的微酸性壤土'},
+{name:'雪柳',family:'木犀科 / 雪柳属 / 雪柳',origin:'中国、日本、朝鲜',difficulty:5,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最密',temperature:'-25~30°C，耐寒性极强',humidity:'适应性极强',watering:'耐旱，土干浇透，忌长期积水',fertilizer:'花后施1次有机肥即可',soil:'不挑土壤，排水良好即可，极耐贫瘠'},
+{name:'竹子',family:'禾本科 / 刚竹属 / 竹子',origin:'中国、东亚',difficulty:5,defaultZone:4,isDefault:false,light:'喜散射光至充足阳光，耐半阴',temperature:'-15~35°C，大部分品种耐寒性好',humidity:'喜湿润环境',watering:'保持湿润，夏季需水量大，忌干旱',fertilizer:'春季施1次有机肥或复合肥',soil:'疏松肥沃、排水良好的微酸性壤土'},
+{name:'木绣球',family:'忍冬科 / 荚蒾属 / 木绣球',origin:'中国',difficulty:3,defaultZone:4,isDefault:false,light:'喜充足阳光，也耐半阴',temperature:'-15~28°C，耐寒性好',humidity:'喜湿润环境',watering:'保持湿润，夏季需水量大，忌积水',fertilizer:'花后施1次有机肥，秋季施1次磷钾肥',soil:'疏松肥沃、排水良好的微酸性壤土'},
+{name:'山地玫瑰',family:'景天科 / 莲花掌属 / 山地玫瑰',origin:'加那利群岛',difficulty:3,defaultZone:4,isDefault:false,light:'喜充足阳光，夏季休眠期需遮阴',temperature:'5-25°C，喜凉爽，不耐高温高湿',humidity:'耐干燥，忌高湿',watering:'生长期（秋冬春）土干浇透，夏季休眠期断水',fertilizer:'生长期每月1次稀薄液肥，夏季停肥',soil:'颗粒土为主，排水透气性好，可配少量泥炭'},
+{name:'玉扇',family:'阿福花科 / 十二卷属 / 玉扇',origin:'南非',difficulty:2,defaultZone:2,isDefault:false,light:'喜明亮散射光，忌强光直射',temperature:'10-28°C，不耐寒，低于5°C易冻伤',humidity:'喜适中湿度，忌高湿',watering:'土干浇透，冬季减少浇水，忌积水',fertilizer:'生长期每月1次稀薄液肥',soil:'颗粒土为主，排水透气性极好'},
+{name:'夹竹桃',family:'夹竹桃科 / 夹竹桃属 / 夹竹桃',origin:'地中海沿岸、印度',difficulty:5,defaultZone:5,isDefault:false,light:'喜充足阳光，全日照开花最盛',temperature:'-5~40°C，耐寒耐热性好',humidity:'适应性极强',watering:'耐旱，土干浇透，忌长期积水',fertilizer:'春季施1次有机肥即可',soil:'不挑土壤，耐盐碱耐贫瘠，排水良好即可'},
+{name:'凤凰木',family:'豆科 / 凤凰木属 / 凤凰木',origin:'马达加斯加',difficulty:4,defaultZone:5,isDefault:false,light:'喜强光，每天至少6小时直射光',temperature:'10-35°C，不耐寒，低于5°C易冻伤',humidity:'适应性强',watering:'生长期保持湿润，冬季减少浇水',fertilizer:'春季施1次复合肥即可',soil:'疏松肥沃、排水良好的壤土，耐贫瘠'},
+{name:'螺纹铁',family:'天门冬科 / 龙血树属 / 螺纹铁',origin:'非洲热带',difficulty:5,defaultZone:2,isDefault:false,light:'喜明亮散射光，耐阴性强，忌强光直射',temperature:'15-28°C，低于5°C易冻伤',humidity:'喜湿润环境，适应性强',watering:'保持微润，宁干勿湿，忌积水',fertilizer:'生长期每月1次稀薄液肥',soil:'疏松透气、排水良好的腐殖土'},
+{name:'柚子',family:'芸香科 / 柑橘属 / 柚子',origin:'中国南部、东南亚',difficulty:3,defaultZone:5,isDefault:false,light:'喜充足阳光，每天至少5小时直射光',temperature:'5-35°C，低于-3°C易冻伤',humidity:'喜湿润环境',watering:'生长期保持湿润，果期需水量大，忌积水',fertilizer:'生长期每月施1次复合肥，果期增施磷钾肥',soil:'疏松肥沃、排水良好的微酸性壤土'}
 ];
