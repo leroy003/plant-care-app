@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="referrer" content="no-referrer">
   <title>植物光照查询器</title>
-  <link rel="stylesheet" href="style.css?v=77">
+  <link rel="stylesheet" href="style.css?v=79">
 </head>
 <body>
 
@@ -394,11 +394,14 @@
       cardFlipped = false;
     }
 
-    // 生成星级
+    // 生成星级（难易度：5星=最难，1星=最容易，数据库中值越大越容易，所以反转显示）
     function renderStars(n) {
+      var display = 6 - n; // 反转：数据库5→显示1星，数据库1→显示5星
+      if (display < 1) display = 1;
+      if (display > 5) display = 5;
       let html = '';
       for (let i = 0; i < 5; i++) {
-        if (i < n) {
+        if (i < display) {
           html += '★';
         } else {
           html += '<span class="empty">☆</span>';
@@ -613,12 +616,17 @@
         const zoneDiv = document.createElement('div');
         zoneDiv.className = 'zone';
 
-        // 区域头部
+        // 区域头部（点击标题可推荐该区域专属植物）
         const headerDiv = document.createElement('div');
-        headerDiv.className = 'zone-header';
+        headerDiv.className = 'zone-header zone-header-clickable';
         var conditionHTML = zone.condition.replace(/(\uff08[^\uff09]*\uff09)/g, '<span class="zone-condition-sub">$1</span>');
         headerDiv.innerHTML = '<span class="zone-number">' + zone.label + '</span>' +
           '<span class="zone-condition">' + conditionHTML + '</span>';
+        headerDiv.addEventListener('click', (function(zoneId) {
+          return function() {
+            showRecCard(getRandomRecommend(zoneId), zoneId);
+          };
+        })(zone.id));
         zoneDiv.appendChild(headerDiv);
 
         // 植物列表
@@ -854,25 +862,35 @@
     // 从统一植物库中随机推荐，排除已在5区域内显示的植物
 
     var currentRecPlant = null;
+    var currentRecZoneFilter = null; // 当前推荐弹窗的区域过滤（null=不过滤）
 
-    // 随机获取一个推荐植物（排除已在区域内显示的）
-    function getRandomRecommend() {
+    // 随机获取一个推荐植物（排除已在区域内显示的，可按区域过滤）
+    function getRandomRecommend(zoneFilter) {
       var available = plantDatabase.filter(function(dbp) {
-        return !plants.some(function(p) { return p.name === dbp.name; });
+        // 排除已在区域中的植物
+        if (plants.some(function(p) { return p.name === dbp.name; })) return false;
+        // 如果有区域过滤，只推荐 defaultZone 匹配的植物
+        if (zoneFilter) return dbp.defaultZone === zoneFilter;
+        return true;
       });
       if (available.length === 0) {
-        // 所有植物都已在区域中，从全库随机
-        available = plantDatabase;
+        // 所有符合条件的植物都已在区域中，从符合区域条件的全库中随机
+        available = plantDatabase.filter(function(dbp) {
+          if (zoneFilter) return dbp.defaultZone === zoneFilter;
+          return true;
+        });
       }
+      if (available.length === 0) return plantDatabase[Math.floor(Math.random() * plantDatabase.length)];
       return available[Math.floor(Math.random() * available.length)];
     }
 
-    // 渲染推荐卡片内容
-    function showRecCard(plant) {
+    // 渲染推荐卡片内容（zoneFilter: 可选，按区域过滤推荐）
+    function showRecCard(plant, zoneFilter) {
       // 先关闭所有已打开的卡片
       hideAllCards();
 
       currentRecPlant = plant;
+      currentRecZoneFilter = zoneFilter || null;
       // 重置为正面
       document.getElementById('recFlipContainer').classList.remove('flipped');
       recCardFlipped = false;
@@ -890,9 +908,10 @@
 
       // 渲染区域单选按钮
       var radiosHTML = '';
+      var checkedZone = zoneFilter || plant.defaultZone;
       zones.forEach(function(zone) {
         radiosHTML += '<label><input type="radio" name="recZone" value="' + zone.id + '"' +
-          (zone.id === plant.defaultZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
+          (zone.id === checkedZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
       });
       document.getElementById('recZoneRadios').innerHTML = radiosHTML;
 
@@ -929,7 +948,7 @@
     document.getElementById('recBackBtn').addEventListener('click', recFlipToDetails);
     document.getElementById('recBackClose').addEventListener('click', hideRecCard);
     document.getElementById('recBackRefresh').addEventListener('click', function() {
-      var newPlant = getRandomRecommend();
+      var newPlant = getRandomRecommend(currentRecZoneFilter);
       currentRecPlant = newPlant;
       document.getElementById('recTitle').textContent = newPlant.name;
       document.getElementById('recFamily').innerHTML = renderFamilyLinks(newPlant.family);
@@ -942,22 +961,23 @@
       document.getElementById('recFertilizer').textContent = newPlant.fertilizer;
       document.getElementById('recSoil').textContent = newPlant.soil;
       var radiosHTML = '';
+      var checkedZone = currentRecZoneFilter || newPlant.defaultZone;
       zones.forEach(function(zone) {
         radiosHTML += '<label><input type="radio" name="recZone" value="' + zone.id + '"' +
-          (zone.id === newPlant.defaultZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
+          (zone.id === checkedZone ? ' checked' : '') + '>' + zone.id + ' ' + zone.condition + '</label>';
       });
       document.getElementById('recZoneRadios').innerHTML = radiosHTML;
       recFlipToPhotos();
     });
 
-    // 推荐植物按钮
+    // 推荐植物按钮（全局推荐，不限区域）
     document.getElementById('btnRecommend').addEventListener('click', function() {
-      showRecCard(getRandomRecommend());
+      showRecCard(getRandomRecommend(null), null);
     });
 
-    // 刷新按钮
+    // 刷新按钮（保持当前的区域过滤）
     document.getElementById('recRefresh').addEventListener('click', function() {
-      showRecCard(getRandomRecommend());
+      showRecCard(getRandomRecommend(currentRecZoneFilter), currentRecZoneFilter);
     });
 
     // 关闭按钮
